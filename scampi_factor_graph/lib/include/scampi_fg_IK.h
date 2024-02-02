@@ -119,21 +119,21 @@ namespace gtsam
 
 
                 case 3:
-                    Ikresidual_func = sym::IkResidualFuncCost1Nl1(fh1, fv1, SymforceFromGtsam(DeltaRot), p_init0, p_init1, p_init2, rot_init_x, rot_init_y, rot_init_z, rot_init_w, epsilon);
+                    Ikresidual_func = sym::IkResidualFuncCost1Nl3(fh1, fv1, SymforceFromGtsam(DeltaRot), p_init0, p_init1, p_init2, rot_init_x, rot_init_y, rot_init_z, rot_init_w, epsilon);
                     if (H1)
                     {
-                        Eigen::Matrix<double, 4, 1> Ikresidual_func_wrt_fh1_Nl1 = sym::IkResidualFuncCost1WrtFh1Nl1(fh1, fv1, SymforceFromGtsam(DeltaRot), p_init0, p_init1, p_init2, rot_init_x, rot_init_y, rot_init_z, rot_init_w, epsilon);
-                        *H1 = (Matrix(4, 1) << Ikresidual_func_wrt_fh1_Nl1).finished();
+                        Eigen::Matrix<double, 4, 1> Ikresidual_func_wrt_fh1_Nl3 = sym::IkResidualFuncCost1WrtFh1Nl3(fh1, fv1, SymforceFromGtsam(DeltaRot), p_init0, p_init1, p_init2, rot_init_x, rot_init_y, rot_init_z, rot_init_w, epsilon);
+                        *H1 = (Matrix(4, 1) << Ikresidual_func_wrt_fh1_Nl3).finished();
                     }
                     if (H2)
                     {   
-                        Eigen::Matrix<double, 4, 1> Ikresidual_func_wrt_fv1_Nl1 = sym::IkResidualFuncCost1WrtFv1Nl1(fh1, fv1, SymforceFromGtsam(DeltaRot), p_init0, p_init1, p_init2, rot_init_x, rot_init_y, rot_init_z, rot_init_w, epsilon);
-                        *H2 = (Matrix(4, 1) << Ikresidual_func_wrt_fv1_Nl1).finished();
+                        Eigen::Matrix<double, 4, 1> Ikresidual_func_wrt_fv1_Nl3 = sym::IkResidualFuncCost1WrtFv1Nl3(fh1, fv1, SymforceFromGtsam(DeltaRot), p_init0, p_init1, p_init2, rot_init_x, rot_init_y, rot_init_z, rot_init_w, epsilon);
+                        *H2 = (Matrix(4, 1) << Ikresidual_func_wrt_fv1_Nl3).finished();
                     }
                     if (H3)
                     {   
-                        Eigen::Matrix<double, 4, 3> Ikresidual_func_wrt_Deltarot_Nl1 = sym::IkResidualFuncCost1WrtDeltarotNl1(fh1, fv1, SymforceFromGtsam(DeltaRot), p_init0, p_init1, p_init2, rot_init_x, rot_init_y, rot_init_z, rot_init_w, epsilon);
-                        *H3 = (Matrix(4, 3) << Ikresidual_func_wrt_Deltarot_Nl1).finished();
+                        Eigen::Matrix<double, 4, 3> Ikresidual_func_wrt_Deltarot_Nl3 = sym::IkResidualFuncCost1WrtDeltarotNl3(fh1, fv1, SymforceFromGtsam(DeltaRot), p_init0, p_init1, p_init2, rot_init_x, rot_init_y, rot_init_z, rot_init_w, epsilon);
+                        *H3 = (Matrix(4, 3) << Ikresidual_func_wrt_Deltarot_Nl3).finished();
                     }
                     break;
 
@@ -159,8 +159,27 @@ namespace gtsam
                     break;
 
 
-
                 case 5:
+                    Ikresidual_func = sym::IkResidualFuncCost1Nl5(fh1, fv1, SymforceFromGtsam(DeltaRot), p_init0, p_init1, p_init2, rot_init_x, rot_init_y, rot_init_z, rot_init_w, epsilon);
+                    if (H1)
+                    {
+                        Eigen::Matrix<double, 4, 1> Ikresidual_func_wrt_fh1_Nl5 = sym::IkResidualFuncCost1WrtFh1Nl5(fh1, fv1, SymforceFromGtsam(DeltaRot), p_init0, p_init1, p_init2, rot_init_x, rot_init_y, rot_init_z, rot_init_w, epsilon);
+                        *H1 = (Matrix(4, 1) << Ikresidual_func_wrt_fh1_Nl5).finished();
+                    }
+                    if (H2)
+                    {   
+                        Eigen::Matrix<double, 4, 1> Ikresidual_func_wrt_fv1_Nl5 = sym::IkResidualFuncCost1WrtFv1Nl5(fh1, fv1, SymforceFromGtsam(DeltaRot), p_init0, p_init1, p_init2, rot_init_x, rot_init_y, rot_init_z, rot_init_w, epsilon);
+                        *H2 = (Matrix(4, 1) << Ikresidual_func_wrt_fv1_Nl5).finished();
+                    }
+                    if (H3)
+                    {   
+                        Eigen::Matrix<double, 4, 3> Ikresidual_func_wrt_Deltarot_Nl5 = sym::IkResidualFuncCost1WrtDeltarotNl5(fh1, fv1, SymforceFromGtsam(DeltaRot), p_init0, p_init1, p_init2, rot_init_x, rot_init_y, rot_init_z, rot_init_w, epsilon);
+                        *H3 = (Matrix(4, 3) << Ikresidual_func_wrt_Deltarot_Nl5).finished();
+                    }
+                    break;
+
+
+                case 6:
                     Ikresidual_func = sym::IkResidualFuncCost1Nl6(fh1, fv1, SymforceFromGtsam(DeltaRot), p_init0, p_init1, p_init2, rot_init_x, rot_init_y, rot_init_z, rot_init_w, epsilon);
                     if (H1)
                     {
@@ -182,7 +201,7 @@ namespace gtsam
 
 
                 case 7:
-                    Ikresidual_func = sym::IkResidualFuncCost1Nl1(fh1, fv1, SymforceFromGtsam(DeltaRot), p_init0, p_init1, p_init2, rot_init_x, rot_init_y, rot_init_z, rot_init_w, epsilon);
+                    Ikresidual_func = sym::IkResidualFuncCost1Nl7(fh1, fv1, SymforceFromGtsam(DeltaRot), p_init0, p_init1, p_init2, rot_init_x, rot_init_y, rot_init_z, rot_init_w, epsilon);
                     if (H1)
                     {
                         Eigen::Matrix<double, 4, 1> Ikresidual_func_wrt_fh1_Nl7 = sym::IkResidualFuncCost1WrtFh1Nl7(fh1, fv1, SymforceFromGtsam(DeltaRot), p_init0, p_init1, p_init2, rot_init_x, rot_init_y, rot_init_z, rot_init_w, epsilon);
@@ -629,21 +648,21 @@ namespace gtsam
 
 
                 case 3:
-                    Ikresidual_func = sym::IkResidualFuncCost2Nl1(fh1, fv1, SymforceFromGtsam(DeltaRot), p_init0, p_init1, p_init2, rot_init_x, rot_init_y, rot_init_z, rot_init_w, epsilon);
+                    Ikresidual_func = sym::IkResidualFuncCost2Nl3(fh1, fv1, SymforceFromGtsam(DeltaRot), p_init0, p_init1, p_init2, rot_init_x, rot_init_y, rot_init_z, rot_init_w, epsilon);
                     if (H1)
                     {
-                        Eigen::Matrix<double, 4, 1> Ikresidual_func_wrt_fh1_Nl1 = sym::IkResidualFuncCost2WrtFh1Nl1(fh1, fv1, SymforceFromGtsam(DeltaRot), p_init0, p_init1, p_init2, rot_init_x, rot_init_y, rot_init_z, rot_init_w, epsilon);
-                        *H1 = (Matrix(4, 1) << Ikresidual_func_wrt_fh1_Nl1).finished();
+                        Eigen::Matrix<double, 4, 1> Ikresidual_func_wrt_fh1_Nl3 = sym::IkResidualFuncCost2WrtFh1Nl3(fh1, fv1, SymforceFromGtsam(DeltaRot), p_init0, p_init1, p_init2, rot_init_x, rot_init_y, rot_init_z, rot_init_w, epsilon);
+                        *H1 = (Matrix(4, 1) << Ikresidual_func_wrt_fh1_Nl3).finished();
                     }
                     if (H2)
                     {   
-                        Eigen::Matrix<double, 4, 1> Ikresidual_func_wrt_fv1_Nl1 = sym::IkResidualFuncCost2WrtFv1Nl1(fh1, fv1, SymforceFromGtsam(DeltaRot), p_init0, p_init1, p_init2, rot_init_x, rot_init_y, rot_init_z, rot_init_w, epsilon);
-                        *H2 = (Matrix(4, 1) << Ikresidual_func_wrt_fv1_Nl1).finished();
+                        Eigen::Matrix<double, 4, 1> Ikresidual_func_wrt_fv1_Nl3 = sym::IkResidualFuncCost2WrtFv1Nl3(fh1, fv1, SymforceFromGtsam(DeltaRot), p_init0, p_init1, p_init2, rot_init_x, rot_init_y, rot_init_z, rot_init_w, epsilon);
+                        *H2 = (Matrix(4, 1) << Ikresidual_func_wrt_fv1_Nl3).finished();
                     }
                     if (H3)
                     {   
-                        Eigen::Matrix<double, 4, 3> Ikresidual_func_wrt_Deltarot_Nl1 = sym::IkResidualFuncCost2WrtDeltarotNl1(fh1, fv1, SymforceFromGtsam(DeltaRot), p_init0, p_init1, p_init2, rot_init_x, rot_init_y, rot_init_z, rot_init_w, epsilon);
-                        *H3 = (Matrix(4, 3) << Ikresidual_func_wrt_Deltarot_Nl1).finished();
+                        Eigen::Matrix<double, 4, 3> Ikresidual_func_wrt_Deltarot_Nl3 = sym::IkResidualFuncCost2WrtDeltarotNl3(fh1, fv1, SymforceFromGtsam(DeltaRot), p_init0, p_init1, p_init2, rot_init_x, rot_init_y, rot_init_z, rot_init_w, epsilon);
+                        *H3 = (Matrix(4, 3) << Ikresidual_func_wrt_Deltarot_Nl3).finished();
                     }
                     break;
 
@@ -669,8 +688,27 @@ namespace gtsam
                     break;
 
 
-
                 case 5:
+                    Ikresidual_func = sym::IkResidualFuncCost2Nl5(fh1, fv1, SymforceFromGtsam(DeltaRot), p_init0, p_init1, p_init2, rot_init_x, rot_init_y, rot_init_z, rot_init_w, epsilon);
+                    if (H1)
+                    {
+                        Eigen::Matrix<double, 4, 1> Ikresidual_func_wrt_fh1_Nl5 = sym::IkResidualFuncCost2WrtFh1Nl5(fh1, fv1, SymforceFromGtsam(DeltaRot), p_init0, p_init1, p_init2, rot_init_x, rot_init_y, rot_init_z, rot_init_w, epsilon);
+                        *H1 = (Matrix(4, 1) << Ikresidual_func_wrt_fh1_Nl5).finished();
+                    }
+                    if (H2)
+                    {   
+                        Eigen::Matrix<double, 4, 1> Ikresidual_func_wrt_fv1_Nl5 = sym::IkResidualFuncCost2WrtFv1Nl5(fh1, fv1, SymforceFromGtsam(DeltaRot), p_init0, p_init1, p_init2, rot_init_x, rot_init_y, rot_init_z, rot_init_w, epsilon);
+                        *H2 = (Matrix(4, 1) << Ikresidual_func_wrt_fv1_Nl5).finished();
+                    }
+                    if (H3)
+                    {   
+                        Eigen::Matrix<double, 4, 3> Ikresidual_func_wrt_Deltarot_Nl5 = sym::IkResidualFuncCost2WrtDeltarotNl5(fh1, fv1, SymforceFromGtsam(DeltaRot), p_init0, p_init1, p_init2, rot_init_x, rot_init_y, rot_init_z, rot_init_w, epsilon);
+                        *H3 = (Matrix(4, 3) << Ikresidual_func_wrt_Deltarot_Nl5).finished();
+                    }
+                    break;
+
+
+                case 6:
                     Ikresidual_func = sym::IkResidualFuncCost2Nl6(fh1, fv1, SymforceFromGtsam(DeltaRot), p_init0, p_init1, p_init2, rot_init_x, rot_init_y, rot_init_z, rot_init_w, epsilon);
                     if (H1)
                     {
@@ -692,7 +730,7 @@ namespace gtsam
 
 
                 case 7:
-                    Ikresidual_func = sym::IkResidualFuncCost2Nl1(fh1, fv1, SymforceFromGtsam(DeltaRot), p_init0, p_init1, p_init2, rot_init_x, rot_init_y, rot_init_z, rot_init_w, epsilon);
+                    Ikresidual_func = sym::IkResidualFuncCost2Nl7(fh1, fv1, SymforceFromGtsam(DeltaRot), p_init0, p_init1, p_init2, rot_init_x, rot_init_y, rot_init_z, rot_init_w, epsilon);
                     if (H1)
                     {
                         Eigen::Matrix<double, 4, 1> Ikresidual_func_wrt_fh1_Nl7 = sym::IkResidualFuncCost2WrtFh1Nl7(fh1, fv1, SymforceFromGtsam(DeltaRot), p_init0, p_init1, p_init2, rot_init_x, rot_init_y, rot_init_z, rot_init_w, epsilon);
@@ -1140,21 +1178,21 @@ namespace gtsam
 
 
                 case 3:
-                    Ikresidual_func = sym::IkResidualFuncCost3Nl1(fh1, fv1, SymforceFromGtsam(DeltaRot), p_init0, p_init1, p_init2, rot_init_x, rot_init_y, rot_init_z, rot_init_w, epsilon);
+                    Ikresidual_func = sym::IkResidualFuncCost3Nl3(fh1, fv1, SymforceFromGtsam(DeltaRot), p_init0, p_init1, p_init2, rot_init_x, rot_init_y, rot_init_z, rot_init_w, epsilon);
                     if (H1)
                     {
-                        Eigen::Matrix<double, 4, 1> Ikresidual_func_wrt_fh1_Nl1 = sym::IkResidualFuncCost3WrtFh1Nl1(fh1, fv1, SymforceFromGtsam(DeltaRot), p_init0, p_init1, p_init2, rot_init_x, rot_init_y, rot_init_z, rot_init_w, epsilon);
-                        *H1 = (Matrix(4, 1) << Ikresidual_func_wrt_fh1_Nl1).finished();
+                        Eigen::Matrix<double, 4, 1> Ikresidual_func_wrt_fh1_Nl3 = sym::IkResidualFuncCost3WrtFh1Nl3(fh1, fv1, SymforceFromGtsam(DeltaRot), p_init0, p_init1, p_init2, rot_init_x, rot_init_y, rot_init_z, rot_init_w, epsilon);
+                        *H1 = (Matrix(4, 1) << Ikresidual_func_wrt_fh1_Nl3).finished();
                     }
                     if (H2)
                     {   
-                        Eigen::Matrix<double, 4, 1> Ikresidual_func_wrt_fv1_Nl1 = sym::IkResidualFuncCost3WrtFv1Nl1(fh1, fv1, SymforceFromGtsam(DeltaRot), p_init0, p_init1, p_init2, rot_init_x, rot_init_y, rot_init_z, rot_init_w, epsilon);
-                        *H2 = (Matrix(4, 1) << Ikresidual_func_wrt_fv1_Nl1).finished();
+                        Eigen::Matrix<double, 4, 1> Ikresidual_func_wrt_fv1_Nl3 = sym::IkResidualFuncCost3WrtFv1Nl3(fh1, fv1, SymforceFromGtsam(DeltaRot), p_init0, p_init1, p_init2, rot_init_x, rot_init_y, rot_init_z, rot_init_w, epsilon);
+                        *H2 = (Matrix(4, 1) << Ikresidual_func_wrt_fv1_Nl3).finished();
                     }
                     if (H3)
                     {   
-                        Eigen::Matrix<double, 4, 3> Ikresidual_func_wrt_Deltarot_Nl1 = sym::IkResidualFuncCost3WrtDeltarotNl1(fh1, fv1, SymforceFromGtsam(DeltaRot), p_init0, p_init1, p_init2, rot_init_x, rot_init_y, rot_init_z, rot_init_w, epsilon);
-                        *H3 = (Matrix(4, 3) << Ikresidual_func_wrt_Deltarot_Nl1).finished();
+                        Eigen::Matrix<double, 4, 3> Ikresidual_func_wrt_Deltarot_Nl3 = sym::IkResidualFuncCost3WrtDeltarotNl3(fh1, fv1, SymforceFromGtsam(DeltaRot), p_init0, p_init1, p_init2, rot_init_x, rot_init_y, rot_init_z, rot_init_w, epsilon);
+                        *H3 = (Matrix(4, 3) << Ikresidual_func_wrt_Deltarot_Nl3).finished();
                     }
                     break;
 
@@ -1180,8 +1218,27 @@ namespace gtsam
                     break;
 
 
-
                 case 5:
+                    Ikresidual_func = sym::IkResidualFuncCost3Nl5(fh1, fv1, SymforceFromGtsam(DeltaRot), p_init0, p_init1, p_init2, rot_init_x, rot_init_y, rot_init_z, rot_init_w, epsilon);
+                    if (H1)
+                    {
+                        Eigen::Matrix<double, 4, 1> Ikresidual_func_wrt_fh1_Nl5 = sym::IkResidualFuncCost3WrtFh1Nl5(fh1, fv1, SymforceFromGtsam(DeltaRot), p_init0, p_init1, p_init2, rot_init_x, rot_init_y, rot_init_z, rot_init_w, epsilon);
+                        *H1 = (Matrix(4, 1) << Ikresidual_func_wrt_fh1_Nl5).finished();
+                    }
+                    if (H2)
+                    {   
+                        Eigen::Matrix<double, 4, 1> Ikresidual_func_wrt_fv1_Nl5 = sym::IkResidualFuncCost3WrtFv1Nl5(fh1, fv1, SymforceFromGtsam(DeltaRot), p_init0, p_init1, p_init2, rot_init_x, rot_init_y, rot_init_z, rot_init_w, epsilon);
+                        *H2 = (Matrix(4, 1) << Ikresidual_func_wrt_fv1_Nl5).finished();
+                    }
+                    if (H3)
+                    {   
+                        Eigen::Matrix<double, 4, 3> Ikresidual_func_wrt_Deltarot_Nl5 = sym::IkResidualFuncCost3WrtDeltarotNl5(fh1, fv1, SymforceFromGtsam(DeltaRot), p_init0, p_init1, p_init2, rot_init_x, rot_init_y, rot_init_z, rot_init_w, epsilon);
+                        *H3 = (Matrix(4, 3) << Ikresidual_func_wrt_Deltarot_Nl5).finished();
+                    }
+                    break;
+
+
+                case 6:
                     Ikresidual_func = sym::IkResidualFuncCost3Nl6(fh1, fv1, SymforceFromGtsam(DeltaRot), p_init0, p_init1, p_init2, rot_init_x, rot_init_y, rot_init_z, rot_init_w, epsilon);
                     if (H1)
                     {
@@ -1203,7 +1260,7 @@ namespace gtsam
 
 
                 case 7:
-                    Ikresidual_func = sym::IkResidualFuncCost3Nl1(fh1, fv1, SymforceFromGtsam(DeltaRot), p_init0, p_init1, p_init2, rot_init_x, rot_init_y, rot_init_z, rot_init_w, epsilon);
+                    Ikresidual_func = sym::IkResidualFuncCost3Nl7(fh1, fv1, SymforceFromGtsam(DeltaRot), p_init0, p_init1, p_init2, rot_init_x, rot_init_y, rot_init_z, rot_init_w, epsilon);
                     if (H1)
                     {
                         Eigen::Matrix<double, 4, 1> Ikresidual_func_wrt_fh1_Nl7 = sym::IkResidualFuncCost3WrtFh1Nl7(fh1, fv1, SymforceFromGtsam(DeltaRot), p_init0, p_init1, p_init2, rot_init_x, rot_init_y, rot_init_z, rot_init_w, epsilon);

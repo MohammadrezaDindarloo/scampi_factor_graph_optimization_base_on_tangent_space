@@ -23,6 +23,7 @@ void inverse_kinematic_factor_graph_optimizer(double p_init_0, double p_init_1, 
     initial_estimate.insert(Symbol('v', 1), init_estimate_v1);
     initial_estimate.insert(Symbol('r', 1), init_estimate_rot);
 
+    std::cout << std::endl << "---------*******largest_cable*******------------" << largest_cable << std::endl;
 
     LevenbergMarquardtOptimizer optimizer(graph, initial_estimate);
     Values result_LM = optimizer.optimize();

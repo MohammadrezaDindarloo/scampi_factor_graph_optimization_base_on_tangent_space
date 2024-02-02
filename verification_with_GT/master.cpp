@@ -179,10 +179,10 @@ int main(int argc, char *argv[])
         IKresults_test_b_in_w_IK.push_back(IKresults[5]);
         
         R_rand = Eigen::Matrix3d::Identity() + Eigen::Matrix3d::Random() * (0.5 * M_PI / 180.0);
-        R_fk_init = IKresults[0] * R_rand;
+        R_fk_init = IKresults[0] ; //* R_rand
 
         r_rand = Eigen::Vector3d::Random() * 0.1;
-        center_fk_init = p_platform + r_rand;
+        center_fk_init = p_platform ; //+ r_rand
 
         Eigen::Vector4d lc_cat;
         lc_cat[0] = lc_meas_cpp_test[i][0]; 
@@ -194,7 +194,7 @@ int main(int argc, char *argv[])
         std::mt19937 gen(rd());
         std::uniform_real_distribution<double> dis(0.95, 1.05);
         double rand_value = dis(gen);
-        Eigen::Vector2d fc_1 = IKresults[2].col(0) * (rand_value);
+        Eigen::Vector2d fc_1 = IKresults[2].col(0) ; //* (rand_value)
         Eigen::Vector3d pos_init = center_fk_init;
         Eigen::Matrix3d rtation_init = R_fk_init;
         std::vector<MatrixXd> FKresults = FK_Factor_Graph_Optimization(robot_params, lc_cat, fc_1, pos_init, rtation_init);

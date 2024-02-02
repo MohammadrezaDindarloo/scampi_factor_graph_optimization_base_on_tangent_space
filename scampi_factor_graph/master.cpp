@@ -20,6 +20,7 @@ int main(int argc, char *argv[])
     Eigen::Vector3d r_to_cog(0, 0, -0.12);
     robot_params.setCog(r_to_cog);
 
+    // Eigen::Vector3d p_platform(3.09173747e-01, -1.83715841e+00,  2.18367984e+00);
     Eigen::Vector3d p_platform(3.09173747e-01, -1.83715841e+00,  2.18367984e+00);
     Eigen::Matrix3d rot_init;
     rot_init << 0.99268615,  0.11337417, -0.04147891,
