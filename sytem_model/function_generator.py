@@ -2,6 +2,7 @@
 import numpy as np
 import symforce
 import sympy as sp
+import os 
 
 symforce.set_symbolic_api("symengine")
 symforce.set_log_level("warning")
@@ -16,7 +17,7 @@ from symforce.values import Values
 from symforce.notebook_util import display, display_code, display_code_file
 from itertools import permutations
 
-
+out_put_save_directory = os.getcwd()
 
 # data structure
 class GeometricVariables:
@@ -187,7 +188,7 @@ def getCableForces(fh, fv, robotstate_, robotparams_, geometric_vars):
 
     # The cog modification recently added to the matlab implementation for the real data experiment
     
-    platform_wrench[3:6, 0] = - geometric_vars.r_to_cog.cross(const_vec) * (2.8 * 9.81)
+    platform_wrench[3:6, 0] = - geometric_vars.r_to_cog.cross(const_vec) * (robotparams_.f_g)
     # End of cog modification
 
     f_v = sf.Matrix([fh, fv])
@@ -537,122 +538,122 @@ def ikSolver(p_platform, rot_init, params, largest_cable, result):
         print("--------------------generating header files name_list[0] IK---------------------")
         cost = cost_z
         def IK_residual_func_cost1_Nl0(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),                        
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             return sf.V4(cost) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_Nl0, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost1_wrt_DeltaRot_Nl0(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_DeltaRot = cost.jacobian(DeltaRot)
             return sf.Matrix43(diff_DeltaRot)  
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_wrt_DeltaRot_Nl0, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
         def IK_residual_func_cost1_wrt_fh1_Nl0(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fh1 = cost.diff(fh1)
             return sf.V4(diff_fh1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_wrt_fh1_Nl0, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
         
         def IK_residual_func_cost1_wrt_fv1_Nl0(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fv1 = cost.diff(fv1)
             return sf.V4(diff_fv1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_wrt_fv1_Nl0, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
         
         print("--------------------cost_z header files generated name_list[0] IK---------------")
 
         cost = cost_cat
         def IK_residual_func_cost2_Nl0(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             return sf.V4(cost) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_Nl0, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost2_wrt_DeltaRot_Nl0(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_DeltaRot = cost.jacobian(DeltaRot)
             return sf.Matrix43(diff_DeltaRot)  
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_wrt_DeltaRot_Nl0, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost2_wrt_fh1_Nl0(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fh1 = cost.diff(fh1)
             return sf.V4(diff_fh1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_wrt_fh1_Nl0, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost2_wrt_fv1_Nl0(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fv1 = cost.diff(fv1)
             return sf.V4(diff_fv1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_wrt_fv1_Nl0, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
         print("--------------------cost_catenary header files generated name_list[0] IK--------")
 
         cost = cost_force
         def IK_residual_func_cost3_Nl0(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             return sf.V4(cost) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_Nl0, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost3_wrt_DeltaRot_Nl0(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_DeltaRot = cost.jacobian(DeltaRot)
             return sf.Matrix43(diff_DeltaRot)  
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_wrt_DeltaRot_Nl0, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost3_wrt_fh1_Nl0(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fh1 = cost.diff(fh1)
             return sf.V4(diff_fh1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_wrt_fh1_Nl0, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost3_wrt_fv1_Nl0(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fv1 = cost.diff(fv1)
             return sf.V4(diff_fv1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_wrt_fv1_Nl0, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
         print("--------------------cost_forces header files generated name_list[0] IK----------")    
         
         
@@ -661,122 +662,122 @@ def ikSolver(p_platform, rot_init, params, largest_cable, result):
         print("--------------------generating header files name_list[1] IK---------------------")
         cost = cost_z
         def IK_residual_func_cost1_Nl1(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             return sf.V4(cost) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_Nl1, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost1_wrt_DeltaRot_Nl1(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_DeltaRot = cost.jacobian(DeltaRot)
             return sf.Matrix43(diff_DeltaRot)  
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_wrt_DeltaRot_Nl1, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost1_wrt_fh1_Nl1(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fh1 = cost.diff(fh1)
             return sf.V4(diff_fh1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_wrt_fh1_Nl1, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost1_wrt_fv1_Nl1(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fv1 = cost.diff(fv1)
             return sf.V4(diff_fv1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_wrt_fv1_Nl1, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
         print("--------------------cost_z header files generated name_list[1] IK---------------")
 
         cost = cost_cat
         def IK_residual_func_cost2_Nl1(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             return sf.V4(cost) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_Nl1, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost2_wrt_DeltaRot_Nl1(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_DeltaRot = cost.jacobian(DeltaRot)
             return sf.Matrix43(diff_DeltaRot)  
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_wrt_DeltaRot_Nl1, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost2_wrt_fh1_Nl1(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fh1 = cost.diff(fh1)
             return sf.V4(diff_fh1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_wrt_fh1_Nl1, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost2_wrt_fv1_Nl1(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fv1 = cost.diff(fv1)
             return sf.V4(diff_fv1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_wrt_fv1_Nl1, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
         print("--------------------cost_catenary header files generated name_list[1] IK--------")
 
         cost = cost_force
         def IK_residual_func_cost3_Nl1(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             return sf.V4(cost) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_Nl1, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost3_wrt_DeltaRot_Nl1(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_DeltaRot = cost.jacobian(DeltaRot)
             return sf.Matrix43(diff_DeltaRot)  
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_wrt_DeltaRot_Nl1, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost3_wrt_fh1_Nl1(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fh1 = cost.diff(fh1)
             return sf.V4(diff_fh1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_wrt_fh1_Nl1, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost3_wrt_fv1_Nl1(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fv1 = cost.diff(fv1)
             return sf.V4(diff_fv1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_wrt_fv1_Nl1, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
         print("--------------------cost_forces header files generated name_list[1] IK----------") 
    
 
@@ -785,122 +786,122 @@ def ikSolver(p_platform, rot_init, params, largest_cable, result):
         print("--------------------generating header files name_list[2] IK---------------------")
         cost = cost_z
         def IK_residual_func_cost1_Nl2(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             return sf.V4(cost) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_Nl2, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost1_wrt_DeltaRot_Nl2(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_DeltaRot = cost.jacobian(DeltaRot)
             return sf.Matrix43(diff_DeltaRot)  
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_wrt_DeltaRot_Nl2, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost1_wrt_fh1_Nl2(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fh1 = cost.diff(fh1)
             return sf.V4(diff_fh1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_wrt_fh1_Nl2, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost1_wrt_fv1_Nl2(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fv1 = cost.diff(fv1)
             return sf.V4(diff_fv1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_wrt_fv1_Nl2, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
         print("--------------------cost_z header files generated name_list[2] IK---------------")
 
         cost = cost_cat
         def IK_residual_func_cost2_Nl2(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             return sf.V4(cost) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_Nl2, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost2_wrt_DeltaRot_Nl2(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_DeltaRot = cost.jacobian(DeltaRot)
             return sf.Matrix43(diff_DeltaRot)  
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_wrt_DeltaRot_Nl2, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost2_wrt_fh1_Nl2(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fh1 = cost.diff(fh1)
             return sf.V4(diff_fh1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_wrt_fh1_Nl2, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost2_wrt_fv1_Nl2(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fv1 = cost.diff(fv1)
             return sf.V4(diff_fv1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_wrt_fv1_Nl2, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
         print("--------------------cost_catenary header files generated name_list[2] IK--------")
 
         cost = cost_force
         def IK_residual_func_cost3_Nl2(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             return sf.V4(cost) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_Nl2, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost3_wrt_DeltaRot_Nl2(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_DeltaRot = cost.jacobian(DeltaRot)
             return sf.Matrix43(diff_DeltaRot)  
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_wrt_DeltaRot_Nl2, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost3_wrt_fh1_Nl2(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fh1 = cost.diff(fh1)
             return sf.V4(diff_fh1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_wrt_fh1_Nl2, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost3_wrt_fv1_Nl2(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fv1 = cost.diff(fv1)
             return sf.V4(diff_fv1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_wrt_fv1_Nl2, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
         print("--------------------cost_forces header files generated name_list[2] IK----------") 
 
         
@@ -910,122 +911,122 @@ def ikSolver(p_platform, rot_init, params, largest_cable, result):
         print("--------------------generating header files name_list[3] IK---------------------")
         cost = cost_z
         def IK_residual_func_cost1_Nl3(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             return sf.V4(cost) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_Nl3, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost1_wrt_DeltaRot_Nl3(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_DeltaRot = cost.jacobian(DeltaRot)
             return sf.Matrix43(diff_DeltaRot)  
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_wrt_DeltaRot_Nl3, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost1_wrt_fh1_Nl3(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fh1 = cost.diff(fh1)
             return sf.V4(diff_fh1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_wrt_fh1_Nl3, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost1_wrt_fv1_Nl3(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fv1 = cost.diff(fv1)
             return sf.V4(diff_fv1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_wrt_fv1_Nl3, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
         print("--------------------cost_z header files generated name_list[3] IK---------------")
 
         cost = cost_cat
         def IK_residual_func_cost2_Nl3(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             return sf.V4(cost) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_Nl3, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost2_wrt_DeltaRot_Nl3(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_DeltaRot = cost.jacobian(DeltaRot)
             return sf.Matrix43(diff_DeltaRot)  
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_wrt_DeltaRot_Nl3, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost2_wrt_fh1_Nl3(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fh1 = cost.diff(fh1)
             return sf.V4(diff_fh1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_wrt_fh1_Nl3, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost2_wrt_fv1_Nl3(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fv1 = cost.diff(fv1)
             return sf.V4(diff_fv1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_wrt_fv1_Nl3, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
         print("--------------------cost_catenary header files generated name_list[3] IK--------")
 
         cost = cost_force
         def IK_residual_func_cost3_Nl3(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             return sf.V4(cost) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_Nl3, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost3_wrt_DeltaRot_Nl3(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_DeltaRot = cost.jacobian(DeltaRot)
             return sf.Matrix43(diff_DeltaRot)  
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_wrt_DeltaRot_Nl3, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost3_wrt_fh1_Nl3(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fh1 = cost.diff(fh1)
             return sf.V4(diff_fh1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_wrt_fh1_Nl3, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost3_wrt_fv1_Nl3(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fv1 = cost.diff(fv1)
             return sf.V4(diff_fv1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_wrt_fv1_Nl3, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
         print("--------------------cost_forces header files generated name_list[3] IK----------") 
 
         
@@ -1034,122 +1035,122 @@ def ikSolver(p_platform, rot_init, params, largest_cable, result):
         print("--------------------generating header files name_list[4] IK---------------------")
         cost = cost_z
         def IK_residual_func_cost1_Nl4(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             return sf.V4(cost) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_Nl4, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost1_wrt_DeltaRot_Nl4(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_DeltaRot = cost.jacobian(DeltaRot)
             return sf.Matrix43(diff_DeltaRot)  
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_wrt_DeltaRot_Nl4, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost1_wrt_fh1_Nl4(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fh1 = cost.diff(fh1)
             return sf.V4(diff_fh1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_wrt_fh1_Nl4, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost1_wrt_fv1_Nl4(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fv1 = cost.diff(fv1)
             return sf.V4(diff_fv1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_wrt_fv1_Nl4, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
         print("--------------------cost_z header files generated name_list[4] IK---------------")
 
         cost = cost_cat
         def IK_residual_func_cost2_Nl4(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             return sf.V4(cost) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_Nl4, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost2_wrt_DeltaRot_Nl4(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_DeltaRot = cost.jacobian(DeltaRot)
             return sf.Matrix43(diff_DeltaRot)  
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_wrt_DeltaRot_Nl4, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost2_wrt_fh1_Nl4(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fh1 = cost.diff(fh1)
             return sf.V4(diff_fh1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_wrt_fh1_Nl4, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost2_wrt_fv1_Nl4(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fv1 = cost.diff(fv1)
             return sf.V4(diff_fv1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_wrt_fv1_Nl4, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
         print("--------------------cost_catenary header files generated name_list[4] IK--------")
 
         cost = cost_force
         def IK_residual_func_cost3_Nl4(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             return sf.V4(cost) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_Nl4, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost3_wrt_DeltaRot_Nl4(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_DeltaRot = cost.jacobian(DeltaRot)
             return sf.Matrix43(diff_DeltaRot)  
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_wrt_DeltaRot_Nl4, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost3_wrt_fh1_Nl4(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fh1 = cost.diff(fh1)
             return sf.V4(diff_fh1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_wrt_fh1_Nl4, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost3_wrt_fv1_Nl4(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fv1 = cost.diff(fv1)
             return sf.V4(diff_fv1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_wrt_fv1_Nl4, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
         print("--------------------cost_forces header files generated name_list[4] IK----------") 
 
 
@@ -1157,122 +1158,122 @@ def ikSolver(p_platform, rot_init, params, largest_cable, result):
         print("--------------------generating header files name_list[5] IK---------------------")
         cost = cost_z
         def IK_residual_func_cost1_Nl5(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             return sf.V4(cost) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_Nl5, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost1_wrt_DeltaRot_Nl5(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_DeltaRot = cost.jacobian(DeltaRot)
             return sf.Matrix43(diff_DeltaRot)  
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_wrt_DeltaRot_Nl5, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost1_wrt_fh1_Nl5(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fh1 = cost.diff(fh1)
             return sf.V4(diff_fh1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_wrt_fh1_Nl5, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost1_wrt_fv1_Nl5(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fv1 = cost.diff(fv1)
             return sf.V4(diff_fv1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_wrt_fv1_Nl5, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
         print("--------------------cost_z header files generated name_list[5] IK---------------")
 
         cost = cost_cat
         def IK_residual_func_cost2_Nl5(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             return sf.V4(cost) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_Nl5, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost2_wrt_DeltaRot_Nl5(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_DeltaRot = cost.jacobian(DeltaRot)
             return sf.Matrix43(diff_DeltaRot)  
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_wrt_DeltaRot_Nl5, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost2_wrt_fh1_Nl5(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fh1 = cost.diff(fh1)
             return sf.V4(diff_fh1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_wrt_fh1_Nl5, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost2_wrt_fv1_Nl5(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fv1 = cost.diff(fv1)
             return sf.V4(diff_fv1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_wrt_fv1_Nl5, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
         print("--------------------cost_catenary header files generated name_list[5] IK--------")
 
         cost = cost_force
         def IK_residual_func_cost3_Nl5(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             return sf.V4(cost) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_Nl5, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost3_wrt_DeltaRot_Nl5(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_DeltaRot = cost.jacobian(DeltaRot)
             return sf.Matrix43(diff_DeltaRot)  
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_wrt_DeltaRot_Nl5, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost3_wrt_fh1_Nl5(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fh1 = cost.diff(fh1)
             return sf.V4(diff_fh1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_wrt_fh1_Nl5, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost3_wrt_fv1_Nl5(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fv1 = cost.diff(fv1)
             return sf.V4(diff_fv1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_wrt_fv1_Nl5, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
         print("--------------------cost_forces header files generated name_list[5] IK----------") 
         
         
@@ -1280,122 +1281,122 @@ def ikSolver(p_platform, rot_init, params, largest_cable, result):
         print("--------------------generating header files name_list[6] IK---------------------")
         cost = cost_z
         def IK_residual_func_cost1_Nl6(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             return sf.V4(cost) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_Nl6, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost1_wrt_DeltaRot_Nl6(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_DeltaRot = cost.jacobian(DeltaRot)
             return sf.Matrix43(diff_DeltaRot)  
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_wrt_DeltaRot_Nl6, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost1_wrt_fh1_Nl6(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fh1 = cost.diff(fh1)
             return sf.V4(diff_fh1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_wrt_fh1_Nl6, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost1_wrt_fv1_Nl6(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fv1 = cost.diff(fv1)
             return sf.V4(diff_fv1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_wrt_fv1_Nl6, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
         print("--------------------cost_z header files generated name_list[6] IK---------------")
 
         cost = cost_cat
         def IK_residual_func_cost2_Nl6(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             return sf.V4(cost) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_Nl6, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost2_wrt_DeltaRot_Nl6(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_DeltaRot = cost.jacobian(DeltaRot)
             return sf.Matrix43(diff_DeltaRot)  
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_wrt_DeltaRot_Nl6, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost2_wrt_fh1_Nl6(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fh1 = cost.diff(fh1)
             return sf.V4(diff_fh1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_wrt_fh1_Nl6, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost2_wrt_fv1_Nl6(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fv1 = cost.diff(fv1)
             return sf.V4(diff_fv1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_wrt_fv1_Nl6, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
         print("--------------------cost_catenary header files generated name_list[6] IK--------")
 
         cost = cost_force
         def IK_residual_func_cost3_Nl6(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             return sf.V4(cost) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_Nl6, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost3_wrt_DeltaRot_Nl6(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_DeltaRot = cost.jacobian(DeltaRot)
             return sf.Matrix43(diff_DeltaRot)  
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_wrt_DeltaRot_Nl6, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost3_wrt_fh1_Nl6(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fh1 = cost.diff(fh1)
             return sf.V4(diff_fh1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_wrt_fh1_Nl6, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost3_wrt_fv1_Nl6(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fv1 = cost.diff(fv1)
             return sf.V4(diff_fv1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_wrt_fv1_Nl6, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
         print("--------------------cost_forces header files generated name_list[6] IK----------") 
         
         
@@ -1403,122 +1404,122 @@ def ikSolver(p_platform, rot_init, params, largest_cable, result):
         print("--------------------generating header files name_list[7] IK---------------------")
         cost = cost_z
         def IK_residual_func_cost1_Nl7(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             return sf.V4(cost) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_Nl7, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost1_wrt_DeltaRot_Nl7(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_DeltaRot = cost.jacobian(DeltaRot)
             return sf.Matrix43(diff_DeltaRot)  
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_wrt_DeltaRot_Nl7, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost1_wrt_fh1_Nl7(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fh1 = cost.diff(fh1)
             return sf.V4(diff_fh1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_wrt_fh1_Nl7, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost1_wrt_fv1_Nl7(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fv1 = cost.diff(fv1)
             return sf.V4(diff_fv1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_wrt_fv1_Nl7, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
         print("--------------------cost_z header files generated name_list[7] IK---------------")
 
         cost = cost_cat
         def IK_residual_func_cost2_Nl7(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             return sf.V4(cost) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_Nl7, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost2_wrt_DeltaRot_Nl7(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_DeltaRot = cost.jacobian(DeltaRot)
             return sf.Matrix43(diff_DeltaRot)  
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_wrt_DeltaRot_Nl7, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost2_wrt_fh1_Nl7(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fh1 = cost.diff(fh1)
             return sf.V4(diff_fh1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_wrt_fh1_Nl7, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost2_wrt_fv1_Nl7(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fv1 = cost.diff(fv1)
             return sf.V4(diff_fv1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_wrt_fv1_Nl7, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
         print("--------------------cost_catenary header files generated name_list[7] IK--------")
 
         cost = cost_force
         def IK_residual_func_cost3_Nl7(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             return sf.V4(cost) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_Nl7, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost3_wrt_DeltaRot_Nl7(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_DeltaRot = cost.jacobian(DeltaRot)
             return sf.Matrix43(diff_DeltaRot)  
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_wrt_DeltaRot_Nl7, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost3_wrt_fh1_Nl7(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fh1 = cost.diff(fh1)
             return sf.V4(diff_fh1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_wrt_fh1_Nl7, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost3_wrt_fv1_Nl7(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fv1 = cost.diff(fv1)
             return sf.V4(diff_fv1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_wrt_fv1_Nl7, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
         print("--------------------cost_forces header files generated name_list[7] IK----------") 
         
         
@@ -1526,122 +1527,122 @@ def ikSolver(p_platform, rot_init, params, largest_cable, result):
         print("--------------------generating header files name_list[8] IK---------------------")
         cost = cost_z
         def IK_residual_func_cost1_Nl8(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             return sf.V4(cost) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_Nl8, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost1_wrt_DeltaRot_Nl8(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_DeltaRot = cost.jacobian(DeltaRot)
             return sf.Matrix43(diff_DeltaRot)  
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_wrt_DeltaRot_Nl8, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost1_wrt_fh1_Nl8(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fh1 = cost.diff(fh1)
             return sf.V4(diff_fh1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_wrt_fh1_Nl8, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost1_wrt_fv1_Nl8(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fv1 = cost.diff(fv1)
             return sf.V4(diff_fv1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_wrt_fv1_Nl8, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
         print("--------------------cost_z header files generated name_list[8] IK---------------")
 
         cost = cost_cat
         def IK_residual_func_cost2_Nl8(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             return sf.V4(cost) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_Nl8, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost2_wrt_DeltaRot_Nl8(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_DeltaRot = cost.jacobian(DeltaRot)
             return sf.Matrix43(diff_DeltaRot)  
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_wrt_DeltaRot_Nl8, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost2_wrt_fh1_Nl8(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fh1 = cost.diff(fh1)
             return sf.V4(diff_fh1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_wrt_fh1_Nl8, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost2_wrt_fv1_Nl8(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fv1 = cost.diff(fv1)
             return sf.V4(diff_fv1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_wrt_fv1_Nl8, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
         print("--------------------cost_catenary header files generated name_list[8] IK--------")
 
         cost = cost_force
         def IK_residual_func_cost3_Nl8(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             return sf.V4(cost) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_Nl8, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost3_wrt_DeltaRot_Nl8(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_DeltaRot = cost.jacobian(DeltaRot)
             return sf.Matrix43(diff_DeltaRot)  
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_wrt_DeltaRot_Nl8, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost3_wrt_fh1_Nl8(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fh1 = cost.diff(fh1)
             return sf.V4(diff_fh1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_wrt_fh1_Nl8, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost3_wrt_fv1_Nl8(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fv1 = cost.diff(fv1)
             return sf.V4(diff_fv1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_wrt_fv1_Nl8, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
         print("--------------------cost_forces header files generated name_list[8] IK----------") 
         
         
@@ -1649,122 +1650,122 @@ def ikSolver(p_platform, rot_init, params, largest_cable, result):
         print("--------------------generating header files name_list[9] IK---------------------")
         cost = cost_z
         def IK_residual_func_cost1_Nl9(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             return sf.V4(cost) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_Nl9, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost1_wrt_DeltaRot_Nl9(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_DeltaRot = cost.jacobian(DeltaRot)
             return sf.Matrix43(diff_DeltaRot)  
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_wrt_DeltaRot_Nl9, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost1_wrt_fh1_Nl9(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fh1 = cost.diff(fh1)
             return sf.V4(diff_fh1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_wrt_fh1_Nl9, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost1_wrt_fv1_Nl9(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fv1 = cost.diff(fv1)
             return sf.V4(diff_fv1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_wrt_fv1_Nl9, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
         print("--------------------cost_z header files generated name_list[9] IK---------------")
 
         cost = cost_cat
         def IK_residual_func_cost2_Nl9(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             return sf.V4(cost) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_Nl9, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost2_wrt_DeltaRot_Nl9(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_DeltaRot = cost.jacobian(DeltaRot)
             return sf.Matrix43(diff_DeltaRot)  
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_wrt_DeltaRot_Nl9, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost2_wrt_fh1_Nl9(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fh1 = cost.diff(fh1)
             return sf.V4(diff_fh1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_wrt_fh1_Nl9, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost2_wrt_fv1_Nl9(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fv1 = cost.diff(fv1)
             return sf.V4(diff_fv1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_wrt_fv1_Nl9, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
         print("--------------------cost_catenary header files generated name_list[9] IK--------")
 
         cost = cost_force
         def IK_residual_func_cost3_Nl9(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             return sf.V4(cost) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_Nl9, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost3_wrt_DeltaRot_Nl9(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_DeltaRot = cost.jacobian(DeltaRot)
             return sf.Matrix43(diff_DeltaRot)  
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_wrt_DeltaRot_Nl9, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost3_wrt_fh1_Nl9(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fh1 = cost.diff(fh1)
             return sf.V4(diff_fh1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_wrt_fh1_Nl9, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost3_wrt_fv1_Nl9(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fv1 = cost.diff(fv1)
             return sf.V4(diff_fv1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_wrt_fv1_Nl9, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
         print("--------------------cost_forces header files generated name_list[9] IK----------") 
         
         
@@ -1772,122 +1773,122 @@ def ikSolver(p_platform, rot_init, params, largest_cable, result):
         print("--------------------generating header files name_list[10] IK---------------------")
         cost = cost_z
         def IK_residual_func_cost1_Nl10(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             return sf.V4(cost) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_Nl10, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost1_wrt_DeltaRot_Nl10(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_DeltaRot = cost.jacobian(DeltaRot)
             return sf.Matrix43(diff_DeltaRot)  
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_wrt_DeltaRot_Nl10, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost1_wrt_fh1_Nl10(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fh1 = cost.diff(fh1)
             return sf.V4(diff_fh1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_wrt_fh1_Nl10, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost1_wrt_fv1_Nl10(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fv1 = cost.diff(fv1)
             return sf.V4(diff_fv1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_wrt_fv1_Nl10, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
         print("--------------------cost_z header files generated name_list[10] IK---------------")
 
         cost = cost_cat
         def IK_residual_func_cost2_Nl10(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             return sf.V4(cost) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_Nl10, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost2_wrt_DeltaRot_Nl10(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_DeltaRot = cost.jacobian(DeltaRot)
             return sf.Matrix43(diff_DeltaRot)  
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_wrt_DeltaRot_Nl10, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost2_wrt_fh1_Nl10(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fh1 = cost.diff(fh1)
             return sf.V4(diff_fh1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_wrt_fh1_Nl10, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost2_wrt_fv1_Nl10(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fv1 = cost.diff(fv1)
             return sf.V4(diff_fv1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_wrt_fv1_Nl10, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
         print("--------------------cost_catenary header files generated name_list[10] IK--------")
 
         cost = cost_force
         def IK_residual_func_cost3_Nl10(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             return sf.V4(cost) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_Nl10, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost3_wrt_DeltaRot_Nl10(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_DeltaRot = cost.jacobian(DeltaRot)
             return sf.Matrix43(diff_DeltaRot)  
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_wrt_DeltaRot_Nl10, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost3_wrt_fh1_Nl10(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fh1 = cost.diff(fh1)
             return sf.V4(diff_fh1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_wrt_fh1_Nl10, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost3_wrt_fv1_Nl10(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fv1 = cost.diff(fv1)
             return sf.V4(diff_fv1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_wrt_fv1_Nl10, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
         print("--------------------cost_forces header files generated name_list[10] IK----------") 
         
         
@@ -1895,122 +1896,122 @@ def ikSolver(p_platform, rot_init, params, largest_cable, result):
         print("--------------------generating header files name_list[11] IK---------------------")
         cost = cost_z
         def IK_residual_func_cost1_Nl11(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             return sf.V4(cost) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_Nl11, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost1_wrt_DeltaRot_Nl11(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_DeltaRot = cost.jacobian(DeltaRot)
             return sf.Matrix43(diff_DeltaRot)  
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_wrt_DeltaRot_Nl11, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost1_wrt_fh1_Nl11(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fh1 = cost.diff(fh1)
             return sf.V4(diff_fh1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_wrt_fh1_Nl11, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost1_wrt_fv1_Nl11(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fv1 = cost.diff(fv1)
             return sf.V4(diff_fv1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_wrt_fv1_Nl11, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
         print("--------------------cost_z header files generated name_list[11] IK---------------")
 
         cost = cost_cat
         def IK_residual_func_cost2_Nl11(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             return sf.V4(cost) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_Nl11, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost2_wrt_DeltaRot_Nl11(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_DeltaRot = cost.jacobian(DeltaRot)
             return sf.Matrix43(diff_DeltaRot)  
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_wrt_DeltaRot_Nl11, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost2_wrt_fh1_Nl11(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fh1 = cost.diff(fh1)
             return sf.V4(diff_fh1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_wrt_fh1_Nl11, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost2_wrt_fv1_Nl11(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fv1 = cost.diff(fv1)
             return sf.V4(diff_fv1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_wrt_fv1_Nl11, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
         print("--------------------cost_catenary header files generated name_list[11] IK--------")
 
         cost = cost_force
         def IK_residual_func_cost3_Nl11(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             return sf.V4(cost) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_Nl11, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost3_wrt_DeltaRot_Nl11(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_DeltaRot = cost.jacobian(DeltaRot)
             return sf.Matrix43(diff_DeltaRot)  
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_wrt_DeltaRot_Nl11, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost3_wrt_fh1_Nl11(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fh1 = cost.diff(fh1)
             return sf.V4(diff_fh1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_wrt_fh1_Nl11, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost3_wrt_fv1_Nl11(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fv1 = cost.diff(fv1)
             return sf.V4(diff_fv1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_wrt_fv1_Nl11, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
         print("--------------------cost_forces header files generated name_list[11] IK----------") 
         
         
@@ -2018,123 +2019,123 @@ def ikSolver(p_platform, rot_init, params, largest_cable, result):
         print("--------------------generating header files name_list[12] IK---------------------")
         cost = cost_z
         def IK_residual_func_cost1_Nl12(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             return sf.V4(cost) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_Nl12, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost1_wrt_DeltaRot_Nl12(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_DeltaRot = cost.jacobian(DeltaRot)
             return sf.Matrix43(diff_DeltaRot)  
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_wrt_DeltaRot_Nl12, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost1_wrt_fh1_Nl12(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fh1 = cost.diff(fh1)
             return sf.V4(diff_fh1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_wrt_fh1_Nl12, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost1_wrt_fv1_Nl12(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fv1 = cost.diff(fv1)
             return sf.V4(diff_fv1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_wrt_fv1_Nl12, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
         print("--------------------cost_z header files generated name_list[12] IK---------------")
 
         cost = cost_cat
         def IK_residual_func_cost2_Nl12(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             return sf.V4(cost) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_Nl12, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
 
         def IK_residual_func_cost2_wrt_DeltaRot_Nl12(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_DeltaRot = cost.jacobian(DeltaRot)
             return sf.Matrix43(diff_DeltaRot) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_wrt_DeltaRot_Nl12, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost2_wrt_fh1_Nl12(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fh1 = cost.diff(fh1)
             return sf.V4(diff_fh1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_wrt_fh1_Nl12, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost2_wrt_fv1_Nl12(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fv1 = cost.diff(fv1)
             return sf.V4(diff_fv1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_wrt_fv1_Nl12, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
         print("--------------------cost_catenary header files generated name_list[12] IK--------")
 
         cost = cost_force
         def IK_residual_func_cost3_Nl12(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             return sf.V4(cost) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_Nl12, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost3_wrt_DeltaRot_Nl12(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_DeltaRot = cost.jacobian(DeltaRot)
             return sf.Matrix43(diff_DeltaRot)  
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_wrt_DeltaRot_Nl12, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost3_wrt_fh1_Nl12(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fh1 = cost.diff(fh1)
             return sf.V4(diff_fh1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_wrt_fh1_Nl12, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost3_wrt_fv1_Nl12(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fv1 = cost.diff(fv1)
             return sf.V4(diff_fv1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_wrt_fv1_Nl12, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
         print("--------------------cost_forces header files generated name_list[12] IK----------") 
         
         
@@ -2142,122 +2143,122 @@ def ikSolver(p_platform, rot_init, params, largest_cable, result):
         print("--------------------generating header files name_list[13] IK---------------------")
         cost = cost_z
         def IK_residual_func_cost1_Nl13(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             return sf.V4(cost) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_Nl13, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost1_wrt_DeltaRot_Nl13(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_DeltaRot = cost.jacobian(DeltaRot)
             return sf.Matrix43(diff_DeltaRot)  
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_wrt_DeltaRot_Nl13, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost1_wrt_fh1_Nl13(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fh1 = cost.diff(fh1)
             return sf.V4(diff_fh1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_wrt_fh1_Nl13, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost1_wrt_fv1_Nl13(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fv1 = cost.diff(fv1)
             return sf.V4(diff_fv1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_wrt_fv1_Nl13, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
         print("--------------------cost_z header files generated name_list[13] IK---------------")
 
         cost = cost_cat
         def IK_residual_func_cost2_Nl13(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             return sf.V4(cost) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_Nl13, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost2_wrt_DeltaRot_Nl13(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_DeltaRot = cost.jacobian(DeltaRot)
             return sf.Matrix43(diff_DeltaRot)  
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_wrt_DeltaRot_Nl13, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost2_wrt_fh1_Nl13(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fh1 = cost.diff(fh1)
             return sf.V4(diff_fh1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_wrt_fh1_Nl13, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost2_wrt_fv1_Nl13(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fv1 = cost.diff(fv1)
             return sf.V4(diff_fv1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_wrt_fv1_Nl13, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
         print("--------------------cost_catenary header files generated name_list[13] IK--------")
 
         cost = cost_force
         def IK_residual_func_cost3_Nl13(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             return sf.V4(cost) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_Nl13, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost3_wrt_DeltaRot_Nl13(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_DeltaRot = cost.jacobian(DeltaRot)
             return sf.Matrix43(diff_DeltaRot)  
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_wrt_DeltaRot_Nl13, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost3_wrt_fh1_Nl13(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fh1 = cost.diff(fh1)
             return sf.V4(diff_fh1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_wrt_fh1_Nl13, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost3_wrt_fv1_Nl13(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fv1 = cost.diff(fv1)
             return sf.V4(diff_fv1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_wrt_fv1_Nl13, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
         print("--------------------cost_forces header files generated name_list[13] IK----------") 
         
         
@@ -2265,122 +2266,122 @@ def ikSolver(p_platform, rot_init, params, largest_cable, result):
         print("--------------------generating header files name_list[14] IK---------------------")
         cost = cost_z
         def IK_residual_func_cost1_Nl14(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             return sf.V4(cost) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_Nl14, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost1_wrt_DeltaRot_Nl14(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_DeltaRot = cost.jacobian(DeltaRot)
             return sf.Matrix43(diff_DeltaRot)  
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_wrt_DeltaRot_Nl14, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost1_wrt_fh1_Nl14(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fh1 = cost.diff(fh1)
             return sf.V4(diff_fh1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_wrt_fh1_Nl14, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost1_wrt_fv1_Nl14(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fv1 = cost.diff(fv1)
             return sf.V4(diff_fv1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_wrt_fv1_Nl14, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
         print("--------------------cost_z header files generated name_list[14] IK---------------")
 
         cost = cost_cat
         def IK_residual_func_cost2_Nl14(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             return sf.V4(cost) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_Nl14, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost2_wrt_DeltaRot_Nl14(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_DeltaRot = cost.jacobian(DeltaRot)
             return sf.Matrix43(diff_DeltaRot)  
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_wrt_DeltaRot_Nl14, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost2_wrt_fh1_Nl14(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fh1 = cost.diff(fh1)
             return sf.V4(diff_fh1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_wrt_fh1_Nl14, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost2_wrt_fv1_Nl14(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fv1 = cost.diff(fv1)
             return sf.V4(diff_fv1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_wrt_fv1_Nl14, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
         print("--------------------cost_catenary header files generated name_list[14] IK--------")
 
         cost = cost_force
         def IK_residual_func_cost3_Nl14(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             return sf.V4(cost) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_Nl14, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost3_wrt_DeltaRot_Nl14(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_DeltaRot = cost.jacobian(DeltaRot)
             return sf.Matrix43(diff_DeltaRot)  
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_wrt_DeltaRot_Nl14, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost3_wrt_fh1_Nl14(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fh1 = cost.diff(fh1)
             return sf.V4(diff_fh1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_wrt_fh1_Nl14, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost3_wrt_fv1_Nl14(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fv1 = cost.diff(fv1)
             return sf.V4(diff_fv1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_wrt_fv1_Nl14, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
         print("--------------------cost_forces header files generated name_list[14] IK----------") 
         
         
@@ -2388,122 +2389,122 @@ def ikSolver(p_platform, rot_init, params, largest_cable, result):
         print("--------------------generating header files name_list[15] IK---------------------")
         cost = cost_z
         def IK_residual_func_cost1_Nl15(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             return sf.V4(cost) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_Nl15, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost1_wrt_DeltaRot_Nl15(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_DeltaRot = cost.jacobian(DeltaRot)
             return sf.Matrix43(diff_DeltaRot)  
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_wrt_DeltaRot_Nl15, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost1_wrt_fh1_Nl15(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fh1 = cost.diff(fh1)
             return sf.V4(diff_fh1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_wrt_fh1_Nl15, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost1_wrt_fv1_Nl15(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fv1 = cost.diff(fv1)
             return sf.V4(diff_fv1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_wrt_fv1_Nl15, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
         print("--------------------cost_z header files generated name_list[15] IK---------------")
 
         cost = cost_cat
         def IK_residual_func_cost2_Nl15(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             return sf.V4(cost) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_Nl15, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost2_wrt_DeltaRot_Nl15(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_DeltaRot = cost.jacobian(DeltaRot)
             return sf.Matrix43(diff_DeltaRot)  
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_wrt_DeltaRot_Nl15, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost2_wrt_fh1_Nl15(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fh1 = cost.diff(fh1)
             return sf.V4(diff_fh1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_wrt_fh1_Nl15, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost2_wrt_fv1_Nl15(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fv1 = cost.diff(fv1)
             return sf.V4(diff_fv1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_wrt_fv1_Nl15, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
         print("--------------------cost_catenary header files generated name_list[15] IK--------")
 
         cost = cost_force
         def IK_residual_func_cost3_Nl15(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             return sf.V4(cost) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_Nl15, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost3_wrt_DeltaRot_Nl15(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_DeltaRot = cost.jacobian(DeltaRot)
             return sf.Matrix43(diff_DeltaRot)  
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_wrt_DeltaRot_Nl15, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost3_wrt_fh1_Nl15(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fh1 = cost.diff(fh1)
             return sf.V4(diff_fh1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_wrt_fh1_Nl15, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost3_wrt_fv1_Nl15(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fv1 = cost.diff(fv1)
             return sf.V4(diff_fv1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_wrt_fv1_Nl15, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
         print("--------------------cost_forces header files generated name_list[15] IK----------") 
         
 
@@ -2511,122 +2512,122 @@ def ikSolver(p_platform, rot_init, params, largest_cable, result):
         print("--------------------generating header files name_list[16] IK---------------------")
         cost = cost_z
         def IK_residual_func_cost1_Nl16(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             return sf.V4(cost) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_Nl16, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost1_wrt_DeltaRot_Nl16(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_DeltaRot = cost.jacobian(DeltaRot)
             return sf.Matrix43(diff_DeltaRot)  
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_wrt_DeltaRot_Nl16, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost1_wrt_fh1_Nl16(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fh1 = cost.diff(fh1)
             return sf.V4(diff_fh1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_wrt_fh1_Nl16, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost1_wrt_fv1_Nl16(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fv1 = cost.diff(fv1)
             return sf.V4(diff_fv1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_wrt_fv1_Nl16, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
         print("--------------------cost_z header files generated name_list[16] IK---------------")
 
         cost = cost_cat
         def IK_residual_func_cost2_Nl16(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             return sf.V4(cost) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_Nl16, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost2_wrt_DeltaRot_Nl16(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_DeltaRot = cost.jacobian(DeltaRot)
             return sf.Matrix43(diff_DeltaRot)  
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_wrt_DeltaRot_Nl16, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost2_wrt_fh1_Nl16(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fh1 = cost.diff(fh1)
             return sf.V4(diff_fh1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_wrt_fh1_Nl16, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost2_wrt_fv1_Nl16(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fv1 = cost.diff(fv1)
             return sf.V4(diff_fv1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_wrt_fv1_Nl16, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
         print("--------------------cost_catenary header files generated name_list[16] IK--------")
 
         cost = cost_force
         def IK_residual_func_cost3_Nl16(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             return sf.V4(cost) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_Nl16, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost3_wrt_DeltaRot_Nl16(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_DeltaRot = cost.jacobian(DeltaRot)
             return sf.Matrix43(diff_DeltaRot)  
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_wrt_DeltaRot_Nl16, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost3_wrt_fh1_Nl16(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fh1 = cost.diff(fh1)
             return sf.V4(diff_fh1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_wrt_fh1_Nl16, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost3_wrt_fv1_Nl16(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fv1 = cost.diff(fv1)
             return sf.V4(diff_fv1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_wrt_fv1_Nl16, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
         print("--------------------cost_forces header files generated name_list[16] IK----------") 
         
         
@@ -2634,122 +2635,122 @@ def ikSolver(p_platform, rot_init, params, largest_cable, result):
         print("--------------------generating header files name_list[17] IK---------------------")
         cost = cost_z
         def IK_residual_func_cost1_Nl17(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             return sf.V4(cost) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_Nl17, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost1_wrt_DeltaRot_Nl17(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_DeltaRot = cost.jacobian(DeltaRot)
             return sf.Matrix43(diff_DeltaRot)  
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_wrt_DeltaRot_Nl17, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost1_wrt_fh1_Nl17(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fh1 = cost.diff(fh1)
             return sf.V4(diff_fh1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_wrt_fh1_Nl17, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost1_wrt_fv1_Nl17(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fv1 = cost.diff(fv1)
             return sf.V4(diff_fv1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_wrt_fv1_Nl17, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
         print("--------------------cost_z header files generated name_list[17] IK---------------")
 
         cost = cost_cat
         def IK_residual_func_cost2_Nl17(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             return sf.V4(cost) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_Nl17, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost2_wrt_DeltaRot_Nl17(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_DeltaRot = cost.jacobian(DeltaRot)
             return sf.Matrix43(diff_DeltaRot)  
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_wrt_DeltaRot_Nl17, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost2_wrt_fh1_Nl17(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fh1 = cost.diff(fh1)
             return sf.V4(diff_fh1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_wrt_fh1_Nl17, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost2_wrt_fv1_Nl17(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fv1 = cost.diff(fv1)
             return sf.V4(diff_fv1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_wrt_fv1_Nl17, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
         print("--------------------cost_catenary header files generated name_list[17] IK--------")
 
         cost = cost_force
         def IK_residual_func_cost3_Nl17(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             return sf.V4(cost) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_Nl17, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost3_wrt_DeltaRot_Nl17(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_DeltaRot = cost.jacobian(DeltaRot)
             return sf.Matrix43(diff_DeltaRot)  
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_wrt_DeltaRot_Nl17, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost3_wrt_fh1_Nl17(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fh1 = cost.diff(fh1)
             return sf.V4(diff_fh1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_wrt_fh1_Nl17, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost3_wrt_fv1_Nl17(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fv1 = cost.diff(fv1)
             return sf.V4(diff_fv1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_wrt_fv1_Nl17, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
         print("--------------------cost_forces header files generated name_list[17] IK----------") 
         
         
@@ -2757,122 +2758,122 @@ def ikSolver(p_platform, rot_init, params, largest_cable, result):
         print("--------------------generating header files name_list[18] IK---------------------")
         cost = cost_z
         def IK_residual_func_cost1_Nl18(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             return sf.V4(cost) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_Nl18, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost1_wrt_DeltaRot_Nl18(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_DeltaRot = cost.jacobian(DeltaRot)
             return sf.Matrix43(diff_DeltaRot)  
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_wrt_DeltaRot_Nl18, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost1_wrt_fh1_Nl18(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fh1 = cost.diff(fh1)
             return sf.V4(diff_fh1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_wrt_fh1_Nl18, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost1_wrt_fv1_Nl18(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fv1 = cost.diff(fv1)
             return sf.V4(diff_fv1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_wrt_fv1_Nl18, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
         print("--------------------cost_z header files generated name_list[18] IK---------------")
 
         cost = cost_cat
         def IK_residual_func_cost2_Nl18(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             return sf.V4(cost) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_Nl18, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost2_wrt_DeltaRot_Nl18(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_DeltaRot = cost.jacobian(DeltaRot)
             return sf.Matrix43(diff_DeltaRot)  
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_wrt_DeltaRot_Nl18, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost2_wrt_fh1_Nl18(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fh1 = cost.diff(fh1)
             return sf.V4(diff_fh1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_wrt_fh1_Nl18, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost2_wrt_fv1_Nl18(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fv1 = cost.diff(fv1)
             return sf.V4(diff_fv1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_wrt_fv1_Nl18, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
         print("--------------------cost_catenary header files generated name_list[18] IK--------")
 
         cost = cost_force
         def IK_residual_func_cost3_Nl18(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             return sf.V4(cost) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_Nl18, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost3_wrt_DeltaRot_Nl18(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_DeltaRot = cost.jacobian(DeltaRot)
             return sf.Matrix43(diff_DeltaRot)  
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_wrt_DeltaRot_Nl18, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost3_wrt_fh1_Nl18(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fh1 = cost.diff(fh1)
             return sf.V4(diff_fh1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_wrt_fh1_Nl18, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost3_wrt_fv1_Nl18(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fv1 = cost.diff(fv1)
             return sf.V4(diff_fv1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_wrt_fv1_Nl18, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
         print("--------------------cost_forces header files generated name_list[18] IK----------") 
         
 
@@ -2880,122 +2881,122 @@ def ikSolver(p_platform, rot_init, params, largest_cable, result):
         print("--------------------generating header files name_list[19] IK---------------------")
         cost = cost_z
         def IK_residual_func_cost1_Nl19(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             return sf.V4(cost) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_Nl19, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost1_wrt_DeltaRot_Nl19(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_DeltaRot = cost.jacobian(DeltaRot)
             return sf.Matrix43(diff_DeltaRot)  
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_wrt_DeltaRot_Nl19, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost1_wrt_fh1_Nl19(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fh1 = cost.diff(fh1)
             return sf.V4(diff_fh1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_wrt_fh1_Nl19, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost1_wrt_fv1_Nl19(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fv1 = cost.diff(fv1)
             return sf.V4(diff_fv1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_wrt_fv1_Nl19, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
         print("--------------------cost_z header files generated name_list[19] IK---------------")
 
         cost = cost_cat
         def IK_residual_func_cost2_Nl19(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             return sf.V4(cost) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_Nl19, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost2_wrt_DeltaRot_Nl19(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_DeltaRot = cost.jacobian(DeltaRot)
             return sf.Matrix43(diff_DeltaRot)  
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_wrt_DeltaRot_Nl19, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost2_wrt_fh1_Nl19(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fh1 = cost.diff(fh1)
             return sf.V4(diff_fh1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_wrt_fh1_Nl19, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost2_wrt_fv1_Nl19(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fv1 = cost.diff(fv1)
             return sf.V4(diff_fv1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_wrt_fv1_Nl19, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
         print("--------------------cost_catenary header files generated name_list[19] IK--------")
 
         cost = cost_force
         def IK_residual_func_cost3_Nl19(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             return sf.V4(cost) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_Nl19, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost3_wrt_DeltaRot_Nl19(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_DeltaRot = cost.jacobian(DeltaRot)
             return sf.Matrix43(diff_DeltaRot)  
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_wrt_DeltaRot_Nl19, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost3_wrt_fh1_Nl19(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fh1 = cost.diff(fh1)
             return sf.V4(diff_fh1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_wrt_fh1_Nl19, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost3_wrt_fv1_Nl19(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fv1 = cost.diff(fv1)
             return sf.V4(diff_fv1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_wrt_fv1_Nl19, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
         print("--------------------cost_forces header files generated name_list[19] IK----------") 
         
         
@@ -3003,122 +3004,122 @@ def ikSolver(p_platform, rot_init, params, largest_cable, result):
         print("--------------------generating header files name_list[20] IK---------------------")
         cost = cost_z
         def IK_residual_func_cost1_Nl20(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             return sf.V4(cost) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_Nl20, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost1_wrt_DeltaRot_Nl20(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_DeltaRot = cost.jacobian(DeltaRot)
             return sf.Matrix43(diff_DeltaRot)  
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_wrt_DeltaRot_Nl20, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost1_wrt_fh1_Nl20(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fh1 = cost.diff(fh1)
             return sf.V4(diff_fh1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_wrt_fh1_Nl20, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost1_wrt_fv1_Nl20(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fv1 = cost.diff(fv1)
             return sf.V4(diff_fv1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_wrt_fv1_Nl20, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
         print("--------------------cost_z header files generated name_list[20] IK---------------")
 
         cost = cost_cat
         def IK_residual_func_cost2_Nl20(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             return sf.V4(cost) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_Nl20, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost2_wrt_DeltaRot_Nl20(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_DeltaRot = cost.jacobian(DeltaRot)
             return sf.Matrix43(diff_DeltaRot)  
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_wrt_DeltaRot_Nl20, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost2_wrt_fh1_Nl20(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fh1 = cost.diff(fh1)
             return sf.V4(diff_fh1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_wrt_fh1_Nl20, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost2_wrt_fv1_Nl20(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fv1 = cost.diff(fv1)
             return sf.V4(diff_fv1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_wrt_fv1_Nl20, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
         print("--------------------cost_catenary header files generated name_list[20] IK--------")
 
         cost = cost_force
         def IK_residual_func_cost3_Nl20(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             return sf.V4(cost) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_Nl20, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost3_wrt_DeltaRot_Nl20(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_DeltaRot = cost.jacobian(DeltaRot)
             return sf.Matrix43(diff_DeltaRot)  
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_wrt_DeltaRot_Nl20, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost3_wrt_fh1_Nl20(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fh1 = cost.diff(fh1)
             return sf.V4(diff_fh1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_wrt_fh1_Nl20, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost3_wrt_fv1_Nl20(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fv1 = cost.diff(fv1)
             return sf.V4(diff_fv1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_wrt_fv1_Nl20, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
         print("--------------------cost_forces header files generated name_list[20] IK----------") 
         
         
@@ -3126,366 +3127,366 @@ def ikSolver(p_platform, rot_init, params, largest_cable, result):
         print("--------------------generating header files name_list[21] IK---------------------")
         cost = cost_z
         def IK_residual_func_cost1_Nl21(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             return sf.V4(cost) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_Nl21, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost1_wrt_DeltaRot_Nl21(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_DeltaRot = cost.jacobian(DeltaRot)
             return sf.Matrix43(diff_DeltaRot)  
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_wrt_DeltaRot_Nl21, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost1_wrt_fh1_Nl21(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fh1 = cost.diff(fh1)
             return sf.V4(diff_fh1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_wrt_fh1_Nl21, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost1_wrt_fv1_Nl21(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fv1 = cost.diff(fv1)
             return sf.V4(diff_fv1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_wrt_fv1_Nl21, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
         print("--------------------cost_z header files generated name_list[21] IK---------------")
 
         cost = cost_cat
         def IK_residual_func_cost2_Nl21(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             return sf.V4(cost) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_Nl21, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost2_wrt_DeltaRot_Nl21(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_DeltaRot = cost.jacobian(DeltaRot)
             return sf.Matrix43(diff_DeltaRot)  
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_wrt_DeltaRot_Nl21, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost2_wrt_fh1_Nl21(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fh1 = cost.diff(fh1)
             return sf.V4(diff_fh1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_wrt_fh1_Nl21, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost2_wrt_fv1_Nl21(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fv1 = cost.diff(fv1)
             return sf.V4(diff_fv1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_wrt_fv1_Nl21, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
         print("--------------------cost_catenary header files generated name_list[21] IK--------")
 
         cost = cost_force
         def IK_residual_func_cost3_Nl21(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             return sf.V4(cost) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_Nl21, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost3_wrt_DeltaRot_Nl21(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_DeltaRot = cost.jacobian(DeltaRot)
             return sf.Matrix43(diff_DeltaRot)  
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_wrt_DeltaRot_Nl21, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost3_wrt_fh1_Nl21(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fh1 = cost.diff(fh1)
             return sf.V4(diff_fh1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_wrt_fh1_Nl21, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost3_wrt_fv1_Nl21(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fv1 = cost.diff(fv1)
             return sf.V4(diff_fv1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_wrt_fv1_Nl21, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
         print("--------------------cost_forces header files generated name_list[21] IK----------") 
         
     if name == name_list[22]:
         print("--------------------generating header files name_list[22] IK---------------------")
         cost = cost_z
         def IK_residual_func_cost1_Nl22(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             return sf.V4(cost) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_Nl22, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost1_wrt_DeltaRot_Nl22(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_DeltaRot = cost.jacobian(DeltaRot)
             return sf.Matrix43(diff_DeltaRot)  
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_wrt_DeltaRot_Nl22, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost1_wrt_fh1_Nl22(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fh1 = cost.diff(fh1)
             return sf.V4(diff_fh1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_wrt_fh1_Nl22, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost1_wrt_fv1_Nl22(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fv1 = cost.diff(fv1)
             return sf.V4(diff_fv1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_wrt_fv1_Nl22, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
         print("--------------------cost_z header files generated name_list[22] IK---------------")
 
         cost = cost_cat
         def IK_residual_func_cost2_Nl22(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             return sf.V4(cost) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_Nl22, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost2_wrt_DeltaRot_Nl22(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_DeltaRot = cost.jacobian(DeltaRot)
             return sf.Matrix43(diff_DeltaRot)  
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_wrt_DeltaRot_Nl22, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost2_wrt_fh1_Nl22(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fh1 = cost.diff(fh1)
             return sf.V4(diff_fh1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_wrt_fh1_Nl22, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost2_wrt_fv1_Nl22(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fv1 = cost.diff(fv1)
             return sf.V4(diff_fv1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_wrt_fv1_Nl22, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
         print("--------------------cost_catenary header files generated name_list[22] IK--------")
 
         cost = cost_force
         def IK_residual_func_cost3_Nl22(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             return sf.V4(cost) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_Nl22, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost3_wrt_DeltaRot_Nl22(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_DeltaRot = cost.jacobian(DeltaRot)
             return sf.Matrix43(diff_DeltaRot)  
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_wrt_DeltaRot_Nl22, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost3_wrt_fh1_Nl22(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fh1 = cost.diff(fh1)
             return sf.V4(diff_fh1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_wrt_fh1_Nl22, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost3_wrt_fv1_Nl22(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fv1 = cost.diff(fv1)
             return sf.V4(diff_fv1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_wrt_fv1_Nl22, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
         print("--------------------cost_forces header files generated name_list[22] IK----------") 
         
     if name == name_list[23]:
         print("--------------------generating header files name_list[23] IK---------------------")
         cost = cost_z
         def IK_residual_func_cost1_Nl23(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             return sf.V4(cost) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_Nl23, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost1_wrt_DeltaRot_Nl23(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_DeltaRot = cost.jacobian(DeltaRot)
             return sf.Matrix43(diff_DeltaRot)  
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_wrt_DeltaRot_Nl23, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost1_wrt_fh1_Nl23(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fh1 = cost.diff(fh1)
             return sf.V4(diff_fh1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_wrt_fh1_Nl23, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost1_wrt_fv1_Nl23(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fv1 = cost.diff(fv1)
             return sf.V4(diff_fv1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost1_wrt_fv1_Nl23, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
         print("--------------------cost_z header files generated name_list[23] IK---------------")
 
         cost = cost_cat
         def IK_residual_func_cost2_Nl23(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             return sf.V4(cost) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_Nl23, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost2_wrt_DeltaRot_Nl23(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_DeltaRot = cost.jacobian(DeltaRot)
             return sf.Matrix43(diff_DeltaRot)  
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_wrt_DeltaRot_Nl23, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost2_wrt_fh1_Nl23(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fh1 = cost.diff(fh1)
             return sf.V4(diff_fh1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_wrt_fh1_Nl23, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost2_wrt_fv1_Nl23(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fv1 = cost.diff(fv1)
             return sf.V4(diff_fv1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost2_wrt_fv1_Nl23, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
         print("--------------------cost_catenary header files generated name_list[23] IK--------")
 
         cost = cost_force
         def IK_residual_func_cost3_Nl23(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             return sf.V4(cost) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_Nl23, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost3_wrt_DeltaRot_Nl23(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_DeltaRot = cost.jacobian(DeltaRot)
             return sf.Matrix43(diff_DeltaRot)  
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_wrt_DeltaRot_Nl23, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost3_wrt_fh1_Nl23(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fh1 = cost.diff(fh1)
             return sf.V4(diff_fh1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_wrt_fh1_Nl23, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
         def IK_residual_func_cost3_wrt_fv1_Nl23(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), DeltaRot: sf.Rot3.symbolic("DeltaRot"),
-                        p_init0: sf.Symbol("p_init0"), p_init1: sf.Symbol("p_init1"), p_init2: sf.Symbol("p_init2"),
-                        rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), epsilon: sf.Scalar = 0
+                        position_vector: sf.Vector3.symbolic("position_vector"),
+                        Rot_init: sf.Rot3.symbolic("Rot_init"), epsilon: sf.Scalar = 0
                         ) -> sf.Vector4:
             diff_fv1 = cost.diff(fv1)
             return sf.V4(diff_fv1) 
         resedual_func_codegen = codegen.Codegen.function(func=IK_residual_func_cost3_wrt_fv1_Nl23, config=codegen.CppConfig(),)
-        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+        resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
         print("--------------------cost_forces header files generated name_list[23] IK----------") 
         print("********************** Generating IK cost function finished **********************") 
 
@@ -3547,62 +3548,62 @@ def fkSolver(lc_cat_measure, rtation_init, params_, fk_result):
     def FK_residual_func_cost1(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), 
                        DeltaRot: sf.Rot3.symbolic("DeltaRot"),
                        position_vector: sf.Vector3.symbolic("position_vector"),
-                       rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), 
+                       Rot_init: sf.Rot3.symbolic("Rot_init"), 
                        lc0: sf.Symbol("lc0"), lc1: sf.Symbol("lc1"), lc2: sf.Symbol("lc2"), lc3: sf.Symbol("lc3"),
                        epsilon: sf.Scalar = 0
                       ) -> sf.Vector4:
         return sf.V4(cost) 
     resedual_func_codegen = codegen.Codegen.function(func=FK_residual_func_cost1, config=codegen.CppConfig(),)
-    resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+    resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
     def FK_residual_func_cost1_wrt_DeltaRot(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), 
                        DeltaRot: sf.Rot3.symbolic("DeltaRot"),
                        position_vector: sf.Vector3.symbolic("position_vector"),
-                       rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), 
+                       Rot_init: sf.Rot3.symbolic("Rot_init"), 
                        lc0: sf.Symbol("lc0"), lc1: sf.Symbol("lc1"), lc2: sf.Symbol("lc2"), lc3: sf.Symbol("lc3"),
                        epsilon: sf.Scalar = 0
                       ) -> sf.Vector4:
         diff_DeltaRot = cost.jacobian(DeltaRot)
         return sf.Matrix43(diff_DeltaRot)  
     resedual_func_codegen = codegen.Codegen.function(func=FK_residual_func_cost1_wrt_DeltaRot, config=codegen.CppConfig(),)
-    resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+    resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
     def FK_residual_func_cost1_wrt_fh1(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), 
                        DeltaRot: sf.Rot3.symbolic("DeltaRot"),
                        position_vector: sf.Vector3.symbolic("position_vector"),
-                       rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), 
+                       Rot_init: sf.Rot3.symbolic("Rot_init"), 
                        lc0: sf.Symbol("lc0"), lc1: sf.Symbol("lc1"), lc2: sf.Symbol("lc2"), lc3: sf.Symbol("lc3"),
                        epsilon: sf.Scalar = 0
                       ) -> sf.Vector4:
         diff_fh1 = cost.diff(fh1)
         return sf.V4(diff_fh1) 
     resedual_func_codegen = codegen.Codegen.function(func=FK_residual_func_cost1_wrt_fh1, config=codegen.CppConfig(),)
-    resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+    resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
     def FK_residual_func_cost1_wrt_fv1(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), 
                        DeltaRot: sf.Rot3.symbolic("DeltaRot"),
                        position_vector: sf.Vector3.symbolic("position_vector"),
-                       rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), 
+                       Rot_init: sf.Rot3.symbolic("Rot_init"), 
                        lc0: sf.Symbol("lc0"), lc1: sf.Symbol("lc1"), lc2: sf.Symbol("lc2"), lc3: sf.Symbol("lc3"),
                        epsilon: sf.Scalar = 0
                       ) -> sf.Vector4:
         diff_fv1 = cost.diff(fv1)
         return sf.V4(diff_fv1) 
     resedual_func_codegen = codegen.Codegen.function(func=FK_residual_func_cost1_wrt_fv1, config=codegen.CppConfig(),)
-    resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+    resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
     
     def FK_residual_func_cost1_wrt_position_vector(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), 
                        DeltaRot: sf.Rot3.symbolic("DeltaRot"),
                        position_vector: sf.Vector3.symbolic("position_vector"),
-                       rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), 
+                       Rot_init: sf.Rot3.symbolic("Rot_init"), 
                        lc0: sf.Symbol("lc0"), lc1: sf.Symbol("lc1"), lc2: sf.Symbol("lc2"), lc3: sf.Symbol("lc3"),
                        epsilon: sf.Scalar = 0
                       ) -> sf.Vector4:
         diff_position_vector = cost.jacobian(position_vector)
         return sf.Matrix43(diff_position_vector)
     resedual_func_codegen = codegen.Codegen.function(func=FK_residual_func_cost1_wrt_position_vector, config=codegen.CppConfig(),)
-    resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+    resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
     print("--------------------cost_z header files generated FK---------------")
     
     
@@ -3610,125 +3611,125 @@ def fkSolver(lc_cat_measure, rtation_init, params_, fk_result):
     def FK_residual_func_cost2(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), 
                        DeltaRot: sf.Rot3.symbolic("DeltaRot"),
                        position_vector: sf.Vector3.symbolic("position_vector"),
-                       rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), 
+                       Rot_init: sf.Rot3.symbolic("Rot_init"), 
                        lc0: sf.Symbol("lc0"), lc1: sf.Symbol("lc1"), lc2: sf.Symbol("lc2"), lc3: sf.Symbol("lc3"),
                        epsilon: sf.Scalar = 0
                       ) -> sf.Vector4:
         return sf.V4(cost) 
     resedual_func_codegen = codegen.Codegen.function(func=FK_residual_func_cost2, config=codegen.CppConfig(),)
-    resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+    resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
     def FK_residual_func_cost2_wrt_DeltaRot(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), 
                        DeltaRot: sf.Rot3.symbolic("DeltaRot"),
                        position_vector: sf.Vector3.symbolic("position_vector"),
-                       rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), 
+                       Rot_init: sf.Rot3.symbolic("Rot_init"), 
                        lc0: sf.Symbol("lc0"), lc1: sf.Symbol("lc1"), lc2: sf.Symbol("lc2"), lc3: sf.Symbol("lc3"),
                        epsilon: sf.Scalar = 0
                       ) -> sf.Vector4:
         diff_DeltaRot = cost.jacobian(DeltaRot)
         return sf.Matrix43(diff_DeltaRot)  
     resedual_func_codegen = codegen.Codegen.function(func=FK_residual_func_cost2_wrt_DeltaRot, config=codegen.CppConfig(),)
-    resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+    resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
     def FK_residual_func_cost2_wrt_fh1(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), 
                        DeltaRot: sf.Rot3.symbolic("DeltaRot"),
                        position_vector: sf.Vector3.symbolic("position_vector"),
-                       rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), 
+                       Rot_init: sf.Rot3.symbolic("Rot_init"), 
                        lc0: sf.Symbol("lc0"), lc1: sf.Symbol("lc1"), lc2: sf.Symbol("lc2"), lc3: sf.Symbol("lc3"),
                        epsilon: sf.Scalar = 0
                       ) -> sf.Vector4:
         diff_fh1 = cost.diff(fh1)
         return sf.V4(diff_fh1) 
     resedual_func_codegen = codegen.Codegen.function(func=FK_residual_func_cost2_wrt_fh1, config=codegen.CppConfig(),)
-    resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+    resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
     def FK_residual_func_cost2_wrt_fv1(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), 
                        DeltaRot: sf.Rot3.symbolic("DeltaRot"),
                        position_vector: sf.Vector3.symbolic("position_vector"),
-                       rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), 
+                       Rot_init: sf.Rot3.symbolic("Rot_init"), 
                        lc0: sf.Symbol("lc0"), lc1: sf.Symbol("lc1"), lc2: sf.Symbol("lc2"), lc3: sf.Symbol("lc3"),
                        epsilon: sf.Scalar = 0
                       ) -> sf.Vector4:
         diff_fv1 = cost.diff(fv1)
         return sf.V4(diff_fv1) 
     resedual_func_codegen = codegen.Codegen.function(func=FK_residual_func_cost2_wrt_fv1, config=codegen.CppConfig(),)
-    resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+    resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
     def FK_residual_func_cost2_wrt_position_vector(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), 
                        DeltaRot: sf.Rot3.symbolic("DeltaRot"),
                        position_vector: sf.Vector3.symbolic("position_vector"),
-                       rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), 
+                       Rot_init: sf.Rot3.symbolic("Rot_init"), 
                        lc0: sf.Symbol("lc0"), lc1: sf.Symbol("lc1"), lc2: sf.Symbol("lc2"), lc3: sf.Symbol("lc3"),
                        epsilon: sf.Scalar = 0
                       ) -> sf.Vector4:
         diff_position_vector = cost.jacobian(position_vector)
         return sf.Matrix43(diff_position_vector)
     resedual_func_codegen = codegen.Codegen.function(func=FK_residual_func_cost2_wrt_position_vector, config=codegen.CppConfig(),)
-    resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+    resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
     print("--------------------cost_catenary header files generated FK--------")
 
     cost = cost_force
     def FK_residual_func_cost3(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), 
                        DeltaRot: sf.Rot3.symbolic("DeltaRot"),
                        position_vector: sf.Vector3.symbolic("position_vector"),
-                       rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), 
+                       Rot_init: sf.Rot3.symbolic("Rot_init"), 
                        lc0: sf.Symbol("lc0"), lc1: sf.Symbol("lc1"), lc2: sf.Symbol("lc2"), lc3: sf.Symbol("lc3"),
                        epsilon: sf.Scalar = 0
                       ) -> sf.Vector4:
         return sf.V4(cost) 
     resedual_func_codegen = codegen.Codegen.function(func=FK_residual_func_cost3, config=codegen.CppConfig(),)
-    resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+    resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
     def FK_residual_func_cost3_wrt_DeltaRot(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), 
                        DeltaRot: sf.Rot3.symbolic("DeltaRot"),
                        position_vector: sf.Vector3.symbolic("position_vector"),
-                       rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), 
+                       Rot_init: sf.Rot3.symbolic("Rot_init"), 
                        lc0: sf.Symbol("lc0"), lc1: sf.Symbol("lc1"), lc2: sf.Symbol("lc2"), lc3: sf.Symbol("lc3"),
                        epsilon: sf.Scalar = 0
                       ) -> sf.Vector4:
         diff_DeltaRot = cost.jacobian(DeltaRot)
         return sf.Matrix43(diff_DeltaRot)  
     resedual_func_codegen = codegen.Codegen.function(func=FK_residual_func_cost3_wrt_DeltaRot, config=codegen.CppConfig(),)
-    resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+    resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
     def FK_residual_func_cost3_wrt_fh1(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), 
                        DeltaRot: sf.Rot3.symbolic("DeltaRot"),
                        position_vector: sf.Vector3.symbolic("position_vector"),
-                       rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), 
+                       Rot_init: sf.Rot3.symbolic("Rot_init"), 
                        lc0: sf.Symbol("lc0"), lc1: sf.Symbol("lc1"), lc2: sf.Symbol("lc2"), lc3: sf.Symbol("lc3"),
                        epsilon: sf.Scalar = 0
                       ) -> sf.Vector4:
         diff_fh1 = cost.diff(fh1)
         return sf.V4(diff_fh1) 
     resedual_func_codegen = codegen.Codegen.function(func=FK_residual_func_cost3_wrt_fh1, config=codegen.CppConfig(),)
-    resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+    resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
 
 
     def FK_residual_func_cost3_wrt_fv1(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), 
                        DeltaRot: sf.Rot3.symbolic("DeltaRot"),
                        position_vector: sf.Vector3.symbolic("position_vector"),
-                       rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), 
+                       Rot_init: sf.Rot3.symbolic("Rot_init"), 
                        lc0: sf.Symbol("lc0"), lc1: sf.Symbol("lc1"), lc2: sf.Symbol("lc2"), lc3: sf.Symbol("lc3"),
                        epsilon: sf.Scalar = 0
                       ) -> sf.Vector4:
         diff_fv1 = cost.diff(fv1)
         return sf.V4(diff_fv1) 
     resedual_func_codegen = codegen.Codegen.function(func=FK_residual_func_cost3_wrt_fv1, config=codegen.CppConfig(),)
-    resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+    resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
     
     def FK_residual_func_cost3_wrt_position_vector(fh1: sf.Symbol('fh1'), fv1: sf.Symbol('fv1'), 
                        DeltaRot: sf.Rot3.symbolic("DeltaRot"),
                        position_vector: sf.Vector3.symbolic("position_vector"),
-                       rot_init_x: sf.Symbol("rot_init_x"), rot_init_y: sf.Symbol("rot_init_y"), rot_init_z: sf.Symbol("rot_init_z"), rot_init_w: sf.Symbol("rot_init_w"), 
+                       Rot_init: sf.Rot3.symbolic("Rot_init"), 
                        lc0: sf.Symbol("lc0"), lc1: sf.Symbol("lc1"), lc2: sf.Symbol("lc2"), lc3: sf.Symbol("lc3"),
                        epsilon: sf.Scalar = 0
                       ) -> sf.Vector4: 
         diff_position_vector = cost.jacobian(position_vector)
         return sf.Matrix43(diff_position_vector)
     resedual_func_codegen = codegen.Codegen.function(func=FK_residual_func_cost3_wrt_position_vector, config=codegen.CppConfig(),)
-    resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir="/home/mohammad/scampi_factor_graph_optimization_base_on_tangent_space/scampi_factor_graph")
+    resedual_func_codegen_data = resedual_func_codegen.generate_function(output_dir=out_put_save_directory)
     print("--------------------cost_forces header files generated FK----------")
     
     print("************************** FK & IK files **************************")
@@ -3804,8 +3805,8 @@ cale_robo_param.setCog(r_to_cog)
 
 # -----------------------------------------------------------------------#
 for largest_cable in list_names_without_l:
-    rot_init= sf.Rot3.symbolic("rot_init")  
-    p_platform = sf.Vector3.symbolic("p_init")
+    rot_init= sf.Rot3.symbolic("Rot_init")  
+    p_platform = sf.Vector3.symbolic("position_vector")
 
     # p_platform[0] = 0.309173747
     # p_platform[1] = -1.83715841
@@ -3815,11 +3816,11 @@ for largest_cable in list_names_without_l:
     #                      [0.04222684, -0.00420248, 0.99909921]])
     # rot_init = sf.Rot3.from_rotation_matrix(rot_init)
 
-    inverseKinematicsSolver(cale_robo_param, p_platform, rot_init, largest_cable)
+    # inverseKinematicsSolver(cale_robo_param, p_platform, rot_init, largest_cable)
 
 # -----------------------------------------------------------------------#
 lc_cat = sf.Vector4.symbolic("lc")
-rtation_init= sf.Rot3.symbolic("rot_init")  
+rtation_init= sf.Rot3.symbolic("Rot_init")  
 
 # lc_cat [0] = 9.12516
 # lc_cat [1] = 9.16127

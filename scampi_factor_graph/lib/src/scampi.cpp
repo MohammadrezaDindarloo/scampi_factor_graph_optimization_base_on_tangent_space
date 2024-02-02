@@ -3,9 +3,7 @@
 
 // ****************************************** IK optimization *******************************************
 // a function to create ivnerse kinematic factor graph 
-void inverse_kinematic_factor_graph_optimizer(double p_init_0, double p_init_1, double p_init_2,
-                              double rot_init_x, double rot_init_y, double rot_init_z, double rot_init_w, 
-                              int largest_cable,
+void inverse_kinematic_factor_graph_optimizer(Eigen::Vector3d p_init, Eigen::Matrix3d rot_init, int largest_cable,
                               double init_estimate_h1, double init_estimate_v1, gtsam::Rot3 init_estimate_rot, gtsam::Values *oprimization_result_LM)
 {
     NonlinearFactorGraph graph;
@@ -15,9 +13,9 @@ void inverse_kinematic_factor_graph_optimizer(double p_init_0, double p_init_1, 
     auto Sensor_noiseModel_cost2 = gtsam::noiseModel::Isotropic::Sigma(4, sqrt(10));
     auto Sensor_noiseModel_cost3 = gtsam::noiseModel::Isotropic::Sigma(4, 1);
 
-    graph.add(std::make_shared<IK_factor_graoh_cost1>(Symbol('h', 1), Symbol('v', 1), Symbol('r', 1), p_init_0, p_init_1, p_init_2, rot_init_x, rot_init_y, rot_init_z, rot_init_w, largest_cable, Sensor_noiseModel_cost1));
-    graph.add(std::make_shared<IK_factor_graoh_cost2>(Symbol('h', 1), Symbol('v', 1), Symbol('r', 1), p_init_0, p_init_1, p_init_2, rot_init_x, rot_init_y, rot_init_z, rot_init_w, largest_cable, Sensor_noiseModel_cost2));
-    graph.add(std::make_shared<IK_factor_graoh_cost3>(Symbol('h', 1), Symbol('v', 1), Symbol('r', 1), p_init_0, p_init_1, p_init_2, rot_init_x, rot_init_y, rot_init_z, rot_init_w, largest_cable, Sensor_noiseModel_cost3));
+    graph.add(std::make_shared<IK_factor_graoh_cost1>(Symbol('h', 1), Symbol('v', 1), Symbol('r', 1), p_init, rot_init, largest_cable, Sensor_noiseModel_cost1));
+    graph.add(std::make_shared<IK_factor_graoh_cost2>(Symbol('h', 1), Symbol('v', 1), Symbol('r', 1), p_init, rot_init, largest_cable, Sensor_noiseModel_cost2));
+    graph.add(std::make_shared<IK_factor_graoh_cost3>(Symbol('h', 1), Symbol('v', 1), Symbol('r', 1), p_init, rot_init, largest_cable, Sensor_noiseModel_cost3));
 
     initial_estimate.insert(Symbol('h', 1), init_estimate_h1);
     initial_estimate.insert(Symbol('v', 1), init_estimate_v1);
@@ -48,21 +46,7 @@ void ikSolver(RobotParameters<double> params,
     //Compute initil cable forces as starting points for the solver
     double fh0, fv0;
     computeInitCableForces<double>(&fh0, &fv0, p_platform, rot_init, params_reord);
-    // Initialize the quaternion array
-    double rotation_matrix_double[9];
-    for (int i = 0; i < 9; ++i) {
-        rotation_matrix_double[i] = rot_init.data()[i];
-    }
-    double quaternion[4];    
-    ceres::RotationMatrixToQuaternion<double>(rotation_matrix_double, quaternion);
-    double rot_init_x = quaternion[1];
-    double rot_init_y = quaternion[2];
-    double rot_init_z = quaternion[3];
-    double rot_init_w = quaternion[0];
-    // initial p_platfrom
-    double p_init_0 = p_platform[0];
-    double p_init_1 = p_platform[1];
-    double p_init_2 = p_platform[2];
+
     // define largest cable
     int largest_cable = -1;
     if(reorder_idx[0] == 0 && reorder_idx[1] == 1 && reorder_idx[2] == 2 && reorder_idx[3] == 3)
@@ -172,9 +156,7 @@ void ikSolver(RobotParameters<double> params,
     gtsam::Rot3 init_estimate_rot = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}};
     // run optimization!
     gtsam::Values optimization_result;
-    inverse_kinematic_factor_graph_optimizer(p_init_0, p_init_1, p_init_2,
-                                            rot_init_x, rot_init_y, rot_init_z, rot_init_w, 
-                                            largest_cable,
+    inverse_kinematic_factor_graph_optimizer(p_platform, rot_init, largest_cable,
                                             init_estimate_h1, init_estimate_v1, init_estimate_rot, &optimization_result);
 
     // optimization_result.print();
@@ -204,7 +186,7 @@ void ikSolver(RobotParameters<double> params,
 // ****************************************** FK optimization *******************************************
 // a function to create forward kinematic factor graph 
 void forward_kinematic_factor_graph_optimizer(double lc0, double lc1, double lc2, double lc3,
-                              double rot_init_x, double rot_init_y, double rot_init_z, double rot_init_w, 
+                              Matrix3d rot_init, 
                               double init_estimate_h1, double init_estimate_v1, gtsam::Rot3 init_estimate_rotation,
                               gtsam::Point3 init_estimate_position, gtsam::Values *oprimization_result_LM)
 {
@@ -215,9 +197,9 @@ void forward_kinematic_factor_graph_optimizer(double lc0, double lc1, double lc2
     auto Sensor_noiseModel_cost2 = gtsam::noiseModel::Isotropic::Sigma(4, sqrt(10));
     auto Sensor_noiseModel_cost3 = gtsam::noiseModel::Isotropic::Sigma(4, 1);
 
-    graph.add(std::make_shared<FK_factor_graoh_cost1>(Symbol('h', 1), Symbol('v', 1), Symbol('r', 1), Symbol('p', 1), lc0, lc1, lc2, lc3, rot_init_x, rot_init_y, rot_init_z, rot_init_w, Sensor_noiseModel_cost1));
-    graph.add(std::make_shared<FK_factor_graoh_cost2>(Symbol('h', 1), Symbol('v', 1), Symbol('r', 1), Symbol('p', 1), lc0, lc1, lc2, lc3, rot_init_x, rot_init_y, rot_init_z, rot_init_w, Sensor_noiseModel_cost2));
-    graph.add(std::make_shared<FK_factor_graoh_cost3>(Symbol('h', 1), Symbol('v', 1), Symbol('r', 1), Symbol('p', 1), lc0, lc1, lc2, lc3, rot_init_x, rot_init_y, rot_init_z, rot_init_w, Sensor_noiseModel_cost3));
+    graph.add(std::make_shared<FK_factor_graoh_cost1>(Symbol('h', 1), Symbol('v', 1), Symbol('r', 1), Symbol('p', 1), lc0, lc1, lc2, lc3, rot_init, Sensor_noiseModel_cost1));
+    graph.add(std::make_shared<FK_factor_graoh_cost2>(Symbol('h', 1), Symbol('v', 1), Symbol('r', 1), Symbol('p', 1), lc0, lc1, lc2, lc3, rot_init, Sensor_noiseModel_cost2));
+    graph.add(std::make_shared<FK_factor_graoh_cost3>(Symbol('h', 1), Symbol('v', 1), Symbol('r', 1), Symbol('p', 1), lc0, lc1, lc2, lc3, rot_init, Sensor_noiseModel_cost3));
 
     initial_estimate.insert(Symbol('h', 1), init_estimate_h1);
     initial_estimate.insert(Symbol('v', 1), init_estimate_v1);
@@ -240,18 +222,6 @@ void fkSolver(double *lc_cat,
               FKDataOut<double> *result)
 {  
 
-    // Initialize the quaternion array
-    double rotation_matrix_double[9];
-    for (int i = 0; i < 9; ++i) {
-        rotation_matrix_double[i] = rot_init.data()[i];
-    }
-    double quaternion[4];    
-    ceres::RotationMatrixToQuaternion<double>(rotation_matrix_double, quaternion);
-    double rot_init_x = quaternion[1];
-    double rot_init_y = quaternion[2];
-    double rot_init_z = quaternion[3];
-    double rot_init_w = quaternion[0];
-
     double lc0 = lc_cat[0];   
     double lc1 = lc_cat[1];
     double lc2 = lc_cat[2];
@@ -265,8 +235,7 @@ void fkSolver(double *lc_cat,
 
     // run optimization!
     gtsam::Values optimization_result; 
-    forward_kinematic_factor_graph_optimizer(lc0, lc1, lc2, lc3,
-                                            rot_init_x, rot_init_y, rot_init_z, rot_init_w, 
+    forward_kinematic_factor_graph_optimizer(lc0, lc1, lc2, lc3, rot_init, 
                                             init_estimate_h1, init_estimate_v1, init_estimate_rotation, init_estimate_position, &optimization_result);
 
     
