@@ -3783,10 +3783,15 @@ def forwardKinematicsSolver(cale_robo_param, lc_cat, rtation_init):
 
 
 # Define variables used in the main function
-Pulley_a = sf.Matrix([-1.9874742, -8.31965637, 8.47184658])
-Pulley_b = sf.Matrix([2.52022147, -8.38887501, 8.46931362])
-Pulley_c = sf.Matrix([2.71799795, 4.77520639, 8.36416322])
-Pulley_d = sf.Matrix([-1.79662371, 4.83333111, 8.37001991])
+# Pulley_a = sf.Matrix([-1.9874742, -8.31965637, 8.47184658])
+# Pulley_b = sf.Matrix([2.52022147, -8.38887501, 8.46931362])
+# Pulley_c = sf.Matrix([2.71799795, 4.77520639, 8.36416322])
+# Pulley_d = sf.Matrix([-1.79662371, 4.83333111, 8.37001991])
+
+Pulley_a = sf.Vector3(-125.0, -110.0, 48.0)
+Pulley_b = sf.Vector3( 125.0, -110.0, 48.0)
+Pulley_c = sf.Vector3( 125.0,  110.0, 48.0)
+Pulley_d = sf.Vector3(-125.0,  110.0, 48.0)
 
 Ee_a = sf.Matrix([-0.21, -0.21, -0.011])
 Ee_b = sf.Matrix([0.21, -0.21, -0.011])
@@ -3795,8 +3800,8 @@ Ee_d = sf.Matrix([-0.21, 0.21, -0.011])
 
 r_to_cog = sf.Matrix([0, 0, -0.12])
 
-g_c = 0.1034955
-f_g = 43.164
+g_c = 0.7100703113867337
+f_g = 333.54
 
 cale_robo_param = CableRobotParams(g_c, f_g)
 cale_robo_param.setPulleyPoses(Pulley_a, Pulley_b, Pulley_c, Pulley_d)

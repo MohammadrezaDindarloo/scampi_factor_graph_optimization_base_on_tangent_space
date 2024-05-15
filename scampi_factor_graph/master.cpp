@@ -1,19 +1,22 @@
 #include "src/main.cpp"
 
+/*
+    GT Data 
+    l_gt: 183.324069126233,169.162981532604,155.642263929178,170.927219368362
+    f1_gt: 690.675811131,105.732855715641 
+    ee_poistion_gt: 9.94283158474076,9.93145571155357,15.9060269359906
+    ee_orientation_gt: -0.19122393512445,-1.06322173025346,0.971850603803798
+*/
+
 int main(int argc, char *argv[])
 {   
     // robot characteristic
-    CableRobotParams robot_params(0.1034955, 43.164);
+    CableRobotParams robot_params(0.7100703113867337, 333.54);
 
-    // Eigen::Vector3d Pulley_a(-1.9874742031097412, -8.319656372070312, 8.471846580505371);
-    // Eigen::Vector3d Pulley_b(2.5193355532036756, -8.388501748709967, 8.469020753679201);
-    // Eigen::Vector3d Pulley_c(2.717151941069913, 4.774436992746004, 8.364108863330584);
-    // Eigen::Vector3d Pulley_d(-1.7965602546229, 4.832889384134232, 8.370128714520508);
-
-    Eigen::Vector3d Pulley_a(-1.9874742 , -8.31965637,  8.47184658);
-    Eigen::Vector3d Pulley_b(2.52022147, -8.38887501,  8.46931362);
-    Eigen::Vector3d Pulley_c(2.71799795, 4.77520639, 8.36416322);
-    Eigen::Vector3d Pulley_d(-1.79662371,  4.83333111,  8.37001991);
+    Eigen::Vector3d Pulley_a(-125.0, -110.0, 48.0);
+    Eigen::Vector3d Pulley_b( 125.0, -110.0, 48.0);
+    Eigen::Vector3d Pulley_c( 125.0,  110.0, 48.0);
+    Eigen::Vector3d Pulley_d(-125.0,  110.0, 48.0);
 
     robot_params.setPulleyPoses(Pulley_a, Pulley_b, Pulley_c, Pulley_d);
 
@@ -26,23 +29,27 @@ int main(int argc, char *argv[])
     Eigen::Vector3d r_to_cog(0, 0, -0.12);
     robot_params.setCog(r_to_cog);
 
-    // Eigen::Vector3d p_platform(3.09173747e-01, -1.83715841e+00,  2.18367984e+00);
-    Eigen::Vector3d p_platform(3.09173747e-01, -1.83715841e+00,  2.18367984e+00);
-    Eigen::Matrix3d rot_init;
-    rot_init << 0.99268615,  0.11337417, -0.04147891,
-               -0.11309773,  0.99354347,  0.00895918,
-                0.04222684, -0.00420248,  0.99909921; 
+    Eigen::Vector3d p_platform(9.94283158474076,9.93145571155357,15.9060269359906);
+
+    gtsam::Rot3 rot_init_;
+    double pitch = -0.19122393512445 * M_PI/180.0;
+    double roll = -1.06322173025346 * M_PI/180.0;
+    double yaw = 0.971850603803798 * M_PI/180.0;
+    rot_init_ = rot_init_.Ypr(yaw, pitch, roll);
+    Eigen::Matrix3d rot_init = gtsamRot3ToEigenMatrix(rot_init_);
     
     // start inverse optimization
     std::vector<MatrixXd> IKresults = IK_Factor_Graph_Optimization(robot_params, rot_init, p_platform);
     // the result of inverse optimization
     std::cout << std::endl << "-------------------inverse result--------------------------" << std::endl;
-    std::cout << std::endl << "rot_platform: " << std::endl << IKresults[0] << std::endl;
-    std::cout << std::endl << "l_cat: " << std::endl << IKresults[1] << std::endl;
-    std::cout << std::endl << "cable_forces: " << std::endl << IKresults[2] << std::endl;
-    std::cout << std::endl << "c1: " << std::endl << IKresults[3] << std::endl;
-    std::cout << std::endl << "c2: " << std::endl << IKresults[4] << std::endl;
-    std::cout << std::endl << "b_in_w: " << std::endl << IKresults[5] << std::endl;
+    // std::cout << std::endl << "rot_platform: " << std::endl << IKresults[0] << std::endl;
+    // std::cout << std::endl << "l_cat: " << std::endl << IKresults[1] << std::endl;
+    // std::cout << std::endl << "cable_forces: " << std::endl << IKresults[2] << std::endl;
+    // std::cout << std::endl << "c1: " << std::endl << IKresults[3] << std::endl;
+    // std::cout << std::endl << "c2: " << std::endl << IKresults[4] << std::endl;
+    // std::cout << std::endl << "b_in_w: " << std::endl << IKresults[5] << std::endl;
+    std::cout << std::endl << "l_cat_error: " << std::endl << (IKresults[1] - gtsam::Vector4{183.324069126233,169.162981532604,155.642263929178,170.927219368362}).norm() << std::endl;
+    std::cout << std::endl << "cable_forces_error: " << std::endl << (IKresults[2].col(0) - gtsam::Vector2{690.675811131,105.732855715641}).norm() << std::endl;
 
     // start forward optimization
     Eigen::VectorXd lc_cat = IKresults[1];
@@ -58,11 +65,6 @@ int main(int argc, char *argv[])
     std::cout << std::endl << "c1: " << std::endl << FKresults[3] << std::endl;
     std::cout << std::endl << "c2: " << std::endl << FKresults[4] << std::endl;
     std::cout << std::endl << "b_in_w: " << std::endl << FKresults[5] << std::endl;
-
-    std::cout << std::endl << "-------------------forward vs inverse--------------------------" << std::endl;
-    std::cout << std::endl << "p_platform_error in  mm: " << std::endl << (FKresults[1] - p_platform).norm() * 1000 << std::endl;
-    std::cout << std::endl << "cable_forces_error in N: " << std::endl << (FKresults[2] - IKresults[2]).norm() << std::endl;
-    std::cout << std::endl << "rot_platform: " << std::endl << FKresults[0].inverse() * (IKresults[0]) << std::endl;
 
     return 0;
 }

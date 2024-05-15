@@ -9,19 +9,17 @@ void inverse_kinematic_factor_graph_optimizer(Eigen::Vector3d p_init, Eigen::Mat
     NonlinearFactorGraph graph;
     Values initial_estimate;
 
-    auto Sensor_noiseModel_cost1 = gtsam::noiseModel::Isotropic::Sigma(4, sqrt(1.0/500.0));
-    auto Sensor_noiseModel_cost2 = gtsam::noiseModel::Isotropic::Sigma(4, sqrt(1.0/10.0));
-    auto Sensor_noiseModel_cost3 = gtsam::noiseModel::Isotropic::Sigma(4, 1.0);
+    auto Sensor_noiseModel_cost1 = gtsam::noiseModel::Isotropic::Sigma(4, 5.0/3.0);
+    auto Sensor_noiseModel_cost2 = gtsam::noiseModel::Isotropic::Sigma(4, 1.0/3.0);
+    auto Sensor_noiseModel_cost3 = gtsam::noiseModel::Isotropic::Sigma(4, 1.0/3.0);
 
     graph.add(std::make_shared<IK_factor_graoh_cost1>(Symbol('h', 1), Symbol('v', 1), Symbol('r', 1), p_init, rot_init, largest_cable, Sensor_noiseModel_cost1));
     graph.add(std::make_shared<IK_factor_graoh_cost2>(Symbol('h', 1), Symbol('v', 1), Symbol('r', 1), p_init, rot_init, largest_cable, Sensor_noiseModel_cost2));
-    graph.add(std::make_shared<IK_factor_graoh_cost3>(Symbol('h', 1), Symbol('v', 1), Symbol('r', 1), p_init, rot_init, largest_cable, Sensor_noiseModel_cost3));
+    // graph.add(std::make_shared<IK_factor_graoh_cost3>(Symbol('h', 1), Symbol('v', 1), Symbol('r', 1), p_init, rot_init, largest_cable, Sensor_noiseModel_cost3));
 
     initial_estimate.insert(Symbol('h', 1), init_estimate_h1);
     initial_estimate.insert(Symbol('v', 1), init_estimate_v1);
     initial_estimate.insert(Symbol('r', 1), init_estimate_rot);
-
-    std::cout << std::endl << "---------*******largest_cable*******------------" << largest_cable << std::endl;
 
     LevenbergMarquardtOptimizer optimizer(graph, initial_estimate);
     Values result_LM = optimizer.optimize();
@@ -153,7 +151,7 @@ void ikSolver(RobotParameters<double> params,
     // initial values for variable 
     double init_estimate_h1 = fh0;
     double init_estimate_v1 = -fv0;
-    gtsam::Rot3 init_estimate_rot = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}};
+    gtsam::Rot3 init_estimate_rot = gtsam::Rot3();
     // run optimization!
     gtsam::Values optimization_result;
     inverse_kinematic_factor_graph_optimizer(p_platform, rot_init, largest_cable,
@@ -193,13 +191,13 @@ void forward_kinematic_factor_graph_optimizer(double lc0, double lc1, double lc2
     NonlinearFactorGraph graph;
     Values initial_estimate;
 
-    auto Sensor_noiseModel_cost1 = gtsam::noiseModel::Isotropic::Sigma(4, sqrt(1.0/10.0));
-    auto Sensor_noiseModel_cost2 = gtsam::noiseModel::Isotropic::Sigma(4, sqrt(1.0/10.0));
-    auto Sensor_noiseModel_cost3 = gtsam::noiseModel::Isotropic::Sigma(4, 1.0);
+    auto Sensor_noiseModel_cost1 = gtsam::noiseModel::Isotropic::Sigma(4, 0.01/3.0);
+    auto Sensor_noiseModel_cost2 = gtsam::noiseModel::Isotropic::Sigma(4, 0.1/3.0);
+    auto Sensor_noiseModel_cost3 = gtsam::noiseModel::Isotropic::Sigma(4, 1.0/3.0);
 
     graph.add(std::make_shared<FK_factor_graoh_cost1>(Symbol('h', 1), Symbol('v', 1), Symbol('r', 1), Symbol('p', 1), lc0, lc1, lc2, lc3, rot_init, Sensor_noiseModel_cost1));
     graph.add(std::make_shared<FK_factor_graoh_cost2>(Symbol('h', 1), Symbol('v', 1), Symbol('r', 1), Symbol('p', 1), lc0, lc1, lc2, lc3, rot_init, Sensor_noiseModel_cost2));
-    graph.add(std::make_shared<FK_factor_graoh_cost3>(Symbol('h', 1), Symbol('v', 1), Symbol('r', 1), Symbol('p', 1), lc0, lc1, lc2, lc3, rot_init, Sensor_noiseModel_cost3));
+    // graph.add(std::make_shared<FK_factor_graoh_cost3>(Symbol('h', 1), Symbol('v', 1), Symbol('r', 1), Symbol('p', 1), lc0, lc1, lc2, lc3, rot_init, Sensor_noiseModel_cost3));
 
     initial_estimate.insert(Symbol('h', 1), init_estimate_h1);
     initial_estimate.insert(Symbol('v', 1), init_estimate_v1);
@@ -226,7 +224,7 @@ void fkSolver(double *lc_cat,
     double lc1 = lc_cat[1];
     double lc2 = lc_cat[2];
     double lc3 = lc_cat[3];
-
+    
     // initial values for variable 
     double init_estimate_h1 = fc0[0];
     double init_estimate_v1 = fc0[1];

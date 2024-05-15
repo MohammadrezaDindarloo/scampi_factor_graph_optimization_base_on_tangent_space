@@ -249,6 +249,6 @@ void computeInitCableForces(T *fh0,
     sx = sx/sx.norm();
     double alpha = acos((sx.transpose()*(b_w-robotparams_.pulleys[0]))[0]/(b_w-robotparams_.pulleys[0]).norm());
     *fv0 = 1*(-robotparams_.f_g)/4.0;
-    *fh0 = abs(*fv0)/tan(alpha);
+    *fh0 = std::abs(*fv0)/tan(alpha);
 }
 
