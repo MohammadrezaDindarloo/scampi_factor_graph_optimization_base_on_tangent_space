@@ -5,10 +5,16 @@ int main(int argc, char *argv[])
     // robot characteristic
     CableRobotParams robot_params(0.1034955, 43.164);
 
+    // Eigen::Vector3d Pulley_a(-1.9874742031097412, -8.319656372070312, 8.471846580505371);
+    // Eigen::Vector3d Pulley_b(2.5193355532036756, -8.388501748709967, 8.469020753679201);
+    // Eigen::Vector3d Pulley_c(2.717151941069913, 4.774436992746004, 8.364108863330584);
+    // Eigen::Vector3d Pulley_d(-1.7965602546229, 4.832889384134232, 8.370128714520508);
+
     Eigen::Vector3d Pulley_a(-1.9874742 , -8.31965637,  8.47184658);
     Eigen::Vector3d Pulley_b(2.52022147, -8.38887501,  8.46931362);
     Eigen::Vector3d Pulley_c(2.71799795, 4.77520639, 8.36416322);
     Eigen::Vector3d Pulley_d(-1.79662371,  4.83333111,  8.37001991);
+
     robot_params.setPulleyPoses(Pulley_a, Pulley_b, Pulley_c, Pulley_d);
 
     Eigen::Vector3d Ee_a(-0.21 , -0.21 , -0.011);  
@@ -52,5 +58,11 @@ int main(int argc, char *argv[])
     std::cout << std::endl << "c1: " << std::endl << FKresults[3] << std::endl;
     std::cout << std::endl << "c2: " << std::endl << FKresults[4] << std::endl;
     std::cout << std::endl << "b_in_w: " << std::endl << FKresults[5] << std::endl;
+
+    std::cout << std::endl << "-------------------forward vs inverse--------------------------" << std::endl;
+    std::cout << std::endl << "p_platform_error in  mm: " << std::endl << (FKresults[1] - p_platform).norm() * 1000 << std::endl;
+    std::cout << std::endl << "cable_forces_error in N: " << std::endl << (FKresults[2] - IKresults[2]).norm() << std::endl;
+    std::cout << std::endl << "rot_platform: " << std::endl << FKresults[0].inverse() * (IKresults[0]) << std::endl;
+
     return 0;
 }

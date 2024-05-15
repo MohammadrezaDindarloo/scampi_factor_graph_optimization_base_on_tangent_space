@@ -3816,7 +3816,7 @@ for largest_cable in list_names_without_l:
     #                      [0.04222684, -0.00420248, 0.99909921]])
     # rot_init = sf.Rot3.from_rotation_matrix(rot_init)
 
-    # inverseKinematicsSolver(cale_robo_param, p_platform, rot_init, largest_cable)
+    inverseKinematicsSolver(cale_robo_param, p_platform, rot_init, largest_cable)
 
 # -----------------------------------------------------------------------#
 lc_cat = sf.Vector4.symbolic("lc")

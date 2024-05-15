@@ -167,7 +167,6 @@ void getCableForces(T fh, T fv,
     robotstate_->cable_forces_compact = cable_forces;
     for(int i=0; i < geometric_vars.sx.size(); i++)
         robotstate_->cable_forces.push_back(cable_forces.block(2*i,0,2,1));
-    // std::cout << std::endl << "cable_forces_fv: \n" << f_v << std::endl;
 }
 
 // A function for the IK solver that puts the cable with the larges length as the first cable for numerical stability
