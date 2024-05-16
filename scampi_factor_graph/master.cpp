@@ -49,22 +49,24 @@ int main(int argc, char *argv[])
     // std::cout << std::endl << "c2: " << std::endl << IKresults[4] << std::endl;
     // std::cout << std::endl << "b_in_w: " << std::endl << IKresults[5] << std::endl;
     std::cout << std::endl << "l_cat_error: " << std::endl << (IKresults[1] - gtsam::Vector4{183.324069126233,169.162981532604,155.642263929178,170.927219368362}).norm() << std::endl;
-    std::cout << std::endl << "cable_forces_error: " << std::endl << (IKresults[2].col(0) - gtsam::Vector2{690.675811131,105.732855715641}).norm() << std::endl;
+    // std::cout << std::endl << "cable_forces_error: " << std::endl << (IKresults[2].col(0) - gtsam::Vector2{690.675811131,105.732855715641}).norm() << std::endl;
 
     // start forward optimization
-    Eigen::VectorXd lc_cat = IKresults[1];
-    Eigen::Vector2d fc_1 = IKresults[2].col(0);
+    Eigen::VectorXd lc_cat = gtsam::Vector4{183.324069126233,169.162981532604,155.642263929178,170.927219368362}; // IKresults[1]
+    Eigen::Vector2d fc_1 = IKresults[2].col(0); 
     Eigen::Vector3d pos_init = p_platform;
     Eigen::Matrix3d rtation_init = rot_init;
     std::vector<MatrixXd> FKresults = FK_Factor_Graph_Optimization(robot_params, lc_cat, fc_1, pos_init, rtation_init);
     // the result of forward optimization
     std::cout << std::endl << "-------------------forward result--------------------------" << std::endl;
-    std::cout << std::endl << "rot_platform: " << std::endl << FKresults[0] << std::endl;
-    std::cout << std::endl << "p_platform: " << std::endl << FKresults[1] << std::endl;
-    std::cout << std::endl << "cable_forces: " << std::endl << FKresults[2] << std::endl;
-    std::cout << std::endl << "c1: " << std::endl << FKresults[3] << std::endl;
-    std::cout << std::endl << "c2: " << std::endl << FKresults[4] << std::endl;
-    std::cout << std::endl << "b_in_w: " << std::endl << FKresults[5] << std::endl;
+    // std::cout << std::endl << "rot_platform: " << std::endl << FKresults[0] << std::endl;
+    // std::cout << std::endl << "p_platform: " << std::endl << FKresults[1] << std::endl;
+    // std::cout << std::endl << "cable_forces: " << std::endl << FKresults[2] << std::endl;
+    // std::cout << std::endl << "c1: " << std::endl << FKresults[3] << std::endl;
+    // std::cout << std::endl << "c2: " << std::endl << FKresults[4] << std::endl;
+    // std::cout << std::endl << "b_in_w: " << std::endl << FKresults[5] << std::endl;
+    std::cout << std::endl << "position_error: " << std::endl << (FKresults[1] - gtsam::Vector3{9.94283158474076,9.93145571155357,15.9060269359906}).norm() << std::endl;
+    // std::cout << std::endl << "cable_forces_error: " << std::endl << (FKresults[2].col(0) - gtsam::Vector2{690.675811131,105.732855715641}).norm() << std::endl;
 
     return 0;
 }
