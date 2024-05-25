@@ -13,6 +13,9 @@ int main(int argc, char *argv[])
     // robot characteristic
     CableRobotParams robot_params(0.7100703113867337, 333.54);
 
+    std::default_random_engine generator(std::random_device{}());
+    std::normal_distribution<double> distribution(0.0, 3.0/sqrt(3.0));
+
     Eigen::Vector3d Pulley_a(-125.0, -110.0, 48.0);
     Eigen::Vector3d Pulley_b( 125.0, -110.0, 48.0);
     Eigen::Vector3d Pulley_c( 125.0,  110.0, 48.0);
@@ -29,7 +32,7 @@ int main(int argc, char *argv[])
     Eigen::Vector3d r_to_cog(0, 0, -0.12);
     robot_params.setCog(r_to_cog);
 
-    Eigen::Vector3d p_platform(9.94283158474076,9.93145571155357,15.9060269359906);
+    Eigen::Vector3d p_platform(9.94283158474076 + distribution(generator),9.93145571155357 + distribution(generator),15.9060269359906 + distribution(generator));
 
     gtsam::Rot3 rot_init_;
     double pitch = -0.19122393512445 * M_PI/180.0;
@@ -65,7 +68,8 @@ int main(int argc, char *argv[])
     // std::cout << std::endl << "c1: " << std::endl << FKresults[3] << std::endl;
     // std::cout << std::endl << "c2: " << std::endl << FKresults[4] << std::endl;
     // std::cout << std::endl << "b_in_w: " << std::endl << FKresults[5] << std::endl;
-    std::cout << std::endl << "position_error: " << std::endl << (FKresults[1] - gtsam::Vector3{9.94283158474076,9.93145571155357,15.9060269359906}).norm() << std::endl;
+    std::cout << std::endl << "position_error before kinematic estimation: " << std::endl << (p_platform - gtsam::Vector3{9.94283158474076,9.93145571155357,15.9060269359906}).norm() << std::endl;
+    std::cout << std::endl << "position_error after  kinematic estimation: " << std::endl << (FKresults[1] - gtsam::Vector3{9.94283158474076,9.93145571155357,15.9060269359906}).norm() << std::endl;
     // std::cout << std::endl << "cable_forces_error: " << std::endl << (FKresults[2].col(0) - gtsam::Vector2{690.675811131,105.732855715641}).norm() << std::endl;
 
     return 0;
