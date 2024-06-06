@@ -1,4 +1,5 @@
 #include "src/main.cpp"
+#include <chrono>
 
 /*
     GT Data 
@@ -7,6 +8,22 @@
     ee_poistion_gt: 9.94283158474076,9.93145571155357,15.9060269359906
     ee_orientation_gt: -0.19122393512445,-1.06322173025346,0.971850603803798
 */
+
+// Declare a time point variable to store the starting time
+std::chrono::time_point<std::chrono::high_resolution_clock> tic_time;
+
+// Function to start the timer
+void tic() {
+    tic_time = std::chrono::high_resolution_clock::now();
+}
+
+
+// Function to stop the timer and return the elapsed time in seconds
+double toc() {
+    auto toc_time = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> elapsed = toc_time - tic_time;
+    return elapsed.count();
+}
 
 int main(int argc, char *argv[])
 {   
@@ -40,7 +57,9 @@ int main(int argc, char *argv[])
     double yaw = 0.971850603803798 * M_PI/180.0;
     rot_init_ = rot_init_.Ypr(yaw, pitch, roll);
     Eigen::Matrix3d rot_init = gtsamRot3ToEigenMatrix(rot_init_);
-    
+
+    // Start the timer
+    tic();
     // start inverse optimization
     std::vector<MatrixXd> IKresults = IK_Factor_Graph_Optimization(robot_params, rot_init, p_platform);
     // the result of inverse optimization
@@ -61,6 +80,10 @@ int main(int argc, char *argv[])
     Eigen::Matrix3d rtation_init = rot_init;
     std::vector<MatrixXd> FKresults = FK_Factor_Graph_Optimization(robot_params, lc_cat, fc_1, pos_init, rtation_init);
     // the result of forward optimization
+    // Stop the timer and print the elapsed time
+    double elapsed = toc();
+    std::cout << "Elapsed time: " << elapsed << " seconds" << std::endl;
+    
     std::cout << std::endl << "-------------------forward result--------------------------" << std::endl;
     // std::cout << std::endl << "rot_platform: " << std::endl << FKresults[0] << std::endl;
     // std::cout << std::endl << "p_platform: " << std::endl << FKresults[1] << std::endl;
