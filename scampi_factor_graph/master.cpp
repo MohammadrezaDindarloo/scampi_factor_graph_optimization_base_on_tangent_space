@@ -1,14 +1,6 @@
 #include "src/main.cpp"
 #include <chrono>
 
-/*
-    GT Data 
-    l_gt: 183.324069126233,169.162981532604,155.642263929178,170.927219368362
-    f1_gt: 690.675811131,105.732855715641 
-    ee_poistion_gt: 9.94283158474076,9.93145571155357,15.9060269359906
-    ee_orientation_gt: -0.19122393512445,-1.06322173025346,0.971850603803798
-*/
-
 // Declare a time point variable to store the starting time
 std::chrono::time_point<std::chrono::high_resolution_clock> tic_time;
 
@@ -32,6 +24,7 @@ int main(int argc, char *argv[])
 
     std::default_random_engine generator(std::random_device{}());
     std::normal_distribution<double> distribution(0.0, 3.0/sqrt(3.0));
+    std::normal_distribution<double> distribution_orientaion(0.0, 0.03/sqrt(3.0));
 
     Eigen::Vector3d Pulley_a(-125.0, -110.0, 48.0);
     Eigen::Vector3d Pulley_b( 125.0, -110.0, 48.0);
@@ -49,51 +42,140 @@ int main(int argc, char *argv[])
     Eigen::Vector3d r_to_cog(0, 0, -0.12);
     robot_params.setCog(r_to_cog);
 
-    Eigen::Vector3d p_platform(9.94283158474076 + distribution(generator),9.93145571155357 + distribution(generator),15.9060269359906 + distribution(generator));
+    std::vector<Eigen::Matrix<double, 3, 1>> p_platform_collection;
+    std::vector<Eigen::Matrix<double, 3, 3>> rot_init_platform_collection;
+    std::vector<Eigen::Matrix<double, 4, 1>> cable_length_collection;
+    std::vector<gtsam::Vector2> calibration_result;
 
-    gtsam::Rot3 rot_init_;
-    double pitch = -0.19122393512445 * M_PI/180.0;
-    double roll = -1.06322173025346 * M_PI/180.0;
-    double yaw = 0.971850603803798 * M_PI/180.0;
-    rot_init_ = rot_init_.Ypr(yaw, pitch, roll);
-    Eigen::Matrix3d rot_init = gtsamRot3ToEigenMatrix(rot_init_);
+    std::cout << "******** Extracting Dataset ********" << std::endl;
+    // Open the CSV file of real dataset and record them in data vector
+    std::ifstream file_position("./dataset/pos_i_cpp_test.csv"); 
+    std::vector<std::vector<double>> real_data_position;
+    if (file_position) {
+        std::string line;
+        while (getline(file_position, line)) {
+            std::stringstream ss(line);
+            std::vector<double> row;
+            std::string val;
+            while (getline(ss, val, ',')) {
+                row.push_back(stod(val));
+            }
+            real_data_position.push_back(row);
+        }
+    std::cout << "Number of position data: " << real_data_position.size() << std::endl;
+    } else {
+        std::cout << "Unable to open file." << std::endl;
+    }
+    double lenght_dataset_for_calibration = real_data_position.size();
+    // Rewrite the data in it's object
+    for (size_t i = 0; i < real_data_position.size(); i++)
+    {
+        p_platform_collection.push_back(Eigen::Vector3d(real_data_position[i][0], real_data_position[i][1], real_data_position[i][2]));
+    }
 
-    // Start the timer
-    tic();
-    // start inverse optimization
-    std::vector<MatrixXd> IKresults = IK_Factor_Graph_Optimization(robot_params, rot_init, p_platform);
-    // the result of inverse optimization
-    std::cout << std::endl << "-------------------inverse result--------------------------" << std::endl;
-    // std::cout << std::endl << "rot_platform: " << std::endl << IKresults[0] << std::endl;
-    // std::cout << std::endl << "l_cat: " << std::endl << IKresults[1] << std::endl;
-    // std::cout << std::endl << "cable_forces: " << std::endl << IKresults[2] << std::endl;
-    // std::cout << std::endl << "c1: " << std::endl << IKresults[3] << std::endl;
-    // std::cout << std::endl << "c2: " << std::endl << IKresults[4] << std::endl;
-    // std::cout << std::endl << "b_in_w: " << std::endl << IKresults[5] << std::endl;
-    std::cout << std::endl << "l_cat_error: " << std::endl << (IKresults[1] - gtsam::Vector4{183.324069126233,169.162981532604,155.642263929178,170.927219368362}).norm() << std::endl;
-    // std::cout << std::endl << "cable_forces_error: " << std::endl << (IKresults[2].col(0) - gtsam::Vector2{690.675811131,105.732855715641}).norm() << std::endl;
+    // ******************************
+    // // This is used for euler orientation extraction 
+    std::ifstream file_orientation("./dataset/R_i_cpp_test.csv");
+    std::vector<std::vector<double>> real_orientation;
+    if (file_orientation) {
+        std::string line;
+        while (getline(file_orientation, line)) {
+            std::stringstream ss(line);
+            std::vector<double> row;
+            std::string val;
+            while (getline(ss, val, ',')) {
+                row.push_back(stod(val));
+            }
+            real_orientation.push_back(row);
+        }
+    std::cout << "Number of orientation data: " << real_orientation.size() << std::endl;
+    } else {
+        std::cout << "Unable to open file." << std::endl;
+    }
 
-    // start forward optimization
-    Eigen::VectorXd lc_cat = gtsam::Vector4{183.324069126233,169.162981532604,155.642263929178,170.927219368362}; // IKresults[1]
-    Eigen::Vector2d fc_1 = IKresults[2].col(0); 
-    Eigen::Vector3d pos_init = p_platform;
-    Eigen::Matrix3d rtation_init = rot_init;
-    std::vector<MatrixXd> FKresults = FK_Factor_Graph_Optimization(robot_params, lc_cat, fc_1, pos_init, rtation_init);
-    // the result of forward optimization
-    // Stop the timer and print the elapsed time
-    double elapsed = toc();
-    std::cout << "Elapsed time: " << elapsed << " seconds" << std::endl;
+    std::ifstream file_lcat("./dataset/lc_meas_cpp_test.csv");
+    std::vector<std::vector<double>> real_data_lcat;
+    if (file_lcat) {
+        std::string line;
+        while (getline(file_lcat, line)) {
+            std::stringstream ss(line);
+            std::vector<double> row;
+            std::string val;
+            while (getline(ss, val, ',')) {
+                row.push_back(stod(val));
+            }
+            real_data_lcat.push_back(row);
+        }
+    std::cout << "Number of encoder data: " << real_data_lcat.size() << std::endl;
+    } else {
+        std::cout << "Unable to open file." << std::endl;
+    }
+    // Rewrite the data in it's object
+    for (size_t i = 0; i < real_data_lcat.size(); i++)
+    {   
+        cable_length_collection.push_back(Eigen::Vector4d(real_data_lcat[i][0], real_data_lcat[i][1],
+                                                        real_data_lcat[i][2], real_data_lcat[i][3]));
+    }
     
-    std::cout << std::endl << "-------------------forward result--------------------------" << std::endl;
-    // std::cout << std::endl << "rot_platform: " << std::endl << FKresults[0] << std::endl;
-    // std::cout << std::endl << "p_platform: " << std::endl << FKresults[1] << std::endl;
-    // std::cout << std::endl << "cable_forces: " << std::endl << FKresults[2] << std::endl;
-    // std::cout << std::endl << "c1: " << std::endl << FKresults[3] << std::endl;
-    // std::cout << std::endl << "c2: " << std::endl << FKresults[4] << std::endl;
-    // std::cout << std::endl << "b_in_w: " << std::endl << FKresults[5] << std::endl;
-    std::cout << std::endl << "position_error before kinematic estimation: " << std::endl << (p_platform - gtsam::Vector3{9.94283158474076,9.93145571155357,15.9060269359906}).norm() << std::endl;
-    std::cout << std::endl << "position_error after  kinematic estimation: " << std::endl << (FKresults[1] - gtsam::Vector3{9.94283158474076,9.93145571155357,15.9060269359906}).norm() << std::endl;
-    // std::cout << std::endl << "cable_forces_error: " << std::endl << (FKresults[2].col(0) - gtsam::Vector2{690.675811131,105.732855715641}).norm() << std::endl;
+    for (size_t i = 0; i < cable_length_collection.size(); i++) // cable_length_collection.size()
+    {
+        i = 0;
+        Eigen::Vector3d p_platform(p_platform_collection[i][0] + distribution(generator),p_platform_collection[i][1] + distribution(generator),p_platform_collection[i][2] + distribution(generator));
 
+        gtsam::Rot3 rot_init_;
+        double pitch = real_orientation[i][0] * M_PI/180.0 + distribution_orientaion(generator);
+        double roll = real_orientation[i][1] * M_PI/180.0 + distribution_orientaion(generator);
+        double yaw = real_orientation[i][2] * M_PI/180.0 + distribution_orientaion(generator);
+        rot_init_ = rot_init_.Ypr(yaw, pitch, roll);
+        Eigen::Matrix3d rot_init = gtsamRot3ToEigenMatrix(rot_init_);
+
+        Eigen::VectorXd lc_cat = gtsam::Vector4{cable_length_collection[i][0], cable_length_collection[i][1], cable_length_collection[i][2], cable_length_collection[i][3]}; // IKresults[1]
+
+        // Start the timer
+        tic();
+        // start inverse optimization
+        std::vector<MatrixXd> IKresults = IK_Factor_Graph_Optimization(robot_params, rot_init, p_platform);
+        // the result of inverse optimization
+        // std::cout << std::endl << "-------------------inverse result--------------------------" << std::endl;
+        // std::cout << std::endl << "rot_platform: " << std::endl << IKresults[0] << std::endl;
+        // std::cout << std::endl << "l_cat: " << std::endl << IKresults[1] << std::endl;
+        std::cout << std::endl << "cable_forces: " << std::endl << IKresults[2] << std::endl;
+        // std::cout << std::endl << "c1: " << std::endl << IKresults[3] << std::endl;
+        // std::cout << std::endl << "c2: " << std::endl << IKresults[4] << std::endl;
+        // std::cout << std::endl << "b_in_w: " << std::endl << IKresults[5] << std::endl;
+        // std::cout << std::endl << "l_cat_error: " << std::endl << (IKresults[1] - gtsam::Vector4{cable_length_collection[i][0], cable_length_collection[i][1], cable_length_collection[i][2], cable_length_collection[i][3]}).norm() << std::endl;
+
+        // start forward optimization
+        Eigen::Vector2d fc_1 = IKresults[2].col(0); 
+        Eigen::Vector3d pos_init = p_platform;
+        Eigen::Matrix3d rtation_init = rot_init;
+        std::vector<MatrixXd> FKresults = FK_Factor_Graph_Optimization(robot_params, lc_cat, fc_1, pos_init, rtation_init);
+        // the result of forward optimization
+        // Stop the timer and print the elapsed time
+        double elapsed = toc();
+        std::cout << "Elapsed time: " << elapsed << " seconds" << std::endl;
+        
+        // std::cout << std::endl << "-------------------forward result--------------------------" << std::endl;
+        // std::cout << std::endl << "rot_platform: " << std::endl << FKresults[0] << std::endl;
+        // std::cout << std::endl << "p_platform: " << std::endl << FKresults[1] << std::endl;
+        // std::cout << std::endl << "cable_forces: " << std::endl << FKresults[2] << std::endl;
+        // std::cout << std::endl << "c1: " << std::endl << FKresults[3] << std::endl;
+        // std::cout << std::endl << "c2: " << std::endl << FKresults[4] << std::endl;
+        // std::cout << std::endl << "b_in_w: " << std::endl << FKresults[5] << std::endl;
+        double position_error_before_kinematic_update = (p_platform - gtsam::Vector3{p_platform_collection[i][0], p_platform_collection[i][1], p_platform_collection[i][2]}).norm();
+        double position_error_after_kinematic_update = (FKresults[1] - gtsam::Vector3{p_platform_collection[i][0], p_platform_collection[i][1], p_platform_collection[i][2]}).norm();
+        std::cout << std::endl << "position_error before kinematic estimation: " << position_error_before_kinematic_update;
+        std::cout << std::endl << "position_error after  kinematic estimation: " << position_error_after_kinematic_update;
+        std::cout << std::endl << "---------------------------------------------------------------------------------------------------------" << std::endl;
+
+        calibration_result.push_back({position_error_before_kinematic_update, position_error_after_kinematic_update});
+
+        std::ofstream file("./result/calibration_result.csv"); // Create a file stream object
+        for (const auto& calib : calibration_result) // Loop through the vector elements
+        {
+            file << calib[0] << "," << calib[1] << std::endl; // Write each element, separated by commas, and end the line
+        }
+        file.close(); // Close the file stream
+    }
     return 0;
 }

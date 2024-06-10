@@ -9,8 +9,8 @@ void inverse_kinematic_factor_graph_optimizer(Eigen::Vector3d p_init, Eigen::Mat
     NonlinearFactorGraph graph;
     Values initial_estimate;
 
-    auto Sensor_noiseModel_cost1 = gtsam::noiseModel::Isotropic::Sigma(4, 5.0/3.0);
-    auto Sensor_noiseModel_cost2 = gtsam::noiseModel::Isotropic::Sigma(4, 1.0/3.0);
+    auto Sensor_noiseModel_cost1 = gtsam::noiseModel::Isotropic::Sigma(4, 5.0);
+    auto Sensor_noiseModel_cost2 = gtsam::noiseModel::Isotropic::Sigma(4, 1.0);
     auto Sensor_noiseModel_cost3 = gtsam::noiseModel::Isotropic::Sigma(4, 1.0/3.0);
 
     graph.add(std::make_shared<IK_factor_graoh_cost1>(Symbol('h', 1), Symbol('v', 1), Symbol('r', 1), p_init, rot_init, largest_cable, Sensor_noiseModel_cost1));
@@ -23,7 +23,7 @@ void inverse_kinematic_factor_graph_optimizer(Eigen::Vector3d p_init, Eigen::Mat
 
     LevenbergMarquardtOptimizer optimizer(graph, initial_estimate);
     Values result_LM = optimizer.optimize();
-    std::cout << std::endl << "-------------------catenary result--------------------------" << std::endl;
+    // std::cout << std::endl << "-------------------catenary result--------------------------" << std::endl;
     std::cout << std::endl << "inverse kinematic optimization error: " << optimizer.error() << std::endl;
     *oprimization_result_LM = result_LM;
 }
@@ -191,13 +191,13 @@ void forward_kinematic_factor_graph_optimizer(double lc0, double lc1, double lc2
     NonlinearFactorGraph graph;
     Values initial_estimate;
 
-    auto Sensor_noiseModel_cost1 = gtsam::noiseModel::Isotropic::Sigma(4, 0.01/3.0);
-    auto Sensor_noiseModel_cost2 = gtsam::noiseModel::Isotropic::Sigma(4, 0.1/3.0);
+    auto Sensor_noiseModel_cost1 = gtsam::noiseModel::Isotropic::Sigma(4, 0.3);
+    auto Sensor_noiseModel_cost2 = gtsam::noiseModel::Isotropic::Sigma(4, 0.3);
     auto Sensor_noiseModel_cost3 = gtsam::noiseModel::Isotropic::Sigma(4, 1.0/3.0);
 
     graph.add(std::make_shared<FK_factor_graoh_cost1>(Symbol('h', 1), Symbol('v', 1), Symbol('r', 1), Symbol('p', 1), lc0, lc1, lc2, lc3, rot_init, Sensor_noiseModel_cost1));
     graph.add(std::make_shared<FK_factor_graoh_cost2>(Symbol('h', 1), Symbol('v', 1), Symbol('r', 1), Symbol('p', 1), lc0, lc1, lc2, lc3, rot_init, Sensor_noiseModel_cost2));
-    // graph.add(std::make_shared<FK_factor_graoh_cost3>(Symbol('h', 1), Symbol('v', 1), Symbol('r', 1), Symbol('p', 1), lc0, lc1, lc2, lc3, rot_init, Sensor_noiseModel_cost3));
+    graph.add(std::make_shared<FK_factor_graoh_cost3>(Symbol('h', 1), Symbol('v', 1), Symbol('r', 1), Symbol('p', 1), lc0, lc1, lc2, lc3, rot_init, Sensor_noiseModel_cost3));
 
     initial_estimate.insert(Symbol('h', 1), init_estimate_h1);
     initial_estimate.insert(Symbol('v', 1), init_estimate_v1);
@@ -206,7 +206,7 @@ void forward_kinematic_factor_graph_optimizer(double lc0, double lc1, double lc2
 
     LevenbergMarquardtOptimizer optimizer(graph, initial_estimate);
     Values result_LM = optimizer.optimize();
-    std::cout << std::endl << "-------------------catenary result--------------------------" << std::endl;
+    // std::cout << std::endl << "-------------------catenary result--------------------------" << std::endl;
     std::cout << std::endl << "forward kinematic optimization error: " << optimizer.error() << std::endl;
     *oprimization_result_LM = result_LM;
 
@@ -228,8 +228,8 @@ void fkSolver(double *lc_cat,
     // initial values for variable 
     double init_estimate_h1 = fc0[0];
     double init_estimate_v1 = fc0[1];
-    gtsam::Rot3 init_estimate_rotation = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}};
-    gtsam::Point3 init_estimate_position = {0, 0, 0};
+    gtsam::Rot3 init_estimate_rotation = gtsam::Rot3();
+    gtsam::Point3 init_estimate_position = pos_init; // {0, 0, 0};
 
     // run optimization!
     gtsam::Values optimization_result; 
