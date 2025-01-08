@@ -19,4 +19,7 @@ plt.title("Pose refinement error")
 plt.legend(['Before refinement', 'After refinement'])
 plt.xlabel("Pose number")
 plt.ylabel("Position error")
+plt.savefig("PositionError.pdf")
 plt.show()
+
+
