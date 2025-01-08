@@ -9,7 +9,6 @@ void tic() {
     tic_time = std::chrono::high_resolution_clock::now();
 }
 
-
 // Function to stop the timer and return the elapsed time in seconds
 double toc() {
     auto toc_time = std::chrono::high_resolution_clock::now();
@@ -24,7 +23,7 @@ int main(int argc, char *argv[])
 
     std::default_random_engine generator(std::random_device{}());
     std::normal_distribution<double> distribution(0.0, 3.0/sqrt(3.0));
-    std::normal_distribution<double> distribution_orientaion(0.0, 0.03/sqrt(3.0));
+    std::normal_distribution<double> distribution_orientaion(0.0, 0.02/sqrt(3.0));
 
     Eigen::Vector3d Pulley_a(-125.0, -110.0, 48.0);
     Eigen::Vector3d Pulley_b( 125.0, -110.0, 48.0);
@@ -119,7 +118,6 @@ int main(int argc, char *argv[])
     
     for (size_t i = 0; i < cable_length_collection.size(); i++) // cable_length_collection.size()
     {
-        i = 0;
         Eigen::Vector3d p_platform(p_platform_collection[i][0] + distribution(generator),p_platform_collection[i][1] + distribution(generator),p_platform_collection[i][2] + distribution(generator));
 
         gtsam::Rot3 rot_init_;
@@ -139,7 +137,7 @@ int main(int argc, char *argv[])
         // std::cout << std::endl << "-------------------inverse result--------------------------" << std::endl;
         // std::cout << std::endl << "rot_platform: " << std::endl << IKresults[0] << std::endl;
         // std::cout << std::endl << "l_cat: " << std::endl << IKresults[1] << std::endl;
-        std::cout << std::endl << "cable_forces: " << std::endl << IKresults[2] << std::endl;
+        // std::cout << std::endl << "cable_forces: " << std::endl << IKresults[2] << std::endl;
         // std::cout << std::endl << "c1: " << std::endl << IKresults[3] << std::endl;
         // std::cout << std::endl << "c2: " << std::endl << IKresults[4] << std::endl;
         // std::cout << std::endl << "b_in_w: " << std::endl << IKresults[5] << std::endl;
@@ -166,6 +164,24 @@ int main(int argc, char *argv[])
         double position_error_after_kinematic_update = (FKresults[1] - gtsam::Vector3{p_platform_collection[i][0], p_platform_collection[i][1], p_platform_collection[i][2]}).norm();
         std::cout << std::endl << "position_error before kinematic estimation: " << position_error_before_kinematic_update;
         std::cout << std::endl << "position_error after  kinematic estimation: " << position_error_after_kinematic_update;
+        std::cout << std::endl << "----------------------";
+
+        double pitch_error_before_kinematic_update = std::abs(EigenMatrixToGtsamRot3(rtation_init).pitch() - real_orientation[i][0]*M_PI/180.0);
+        double pitch_error_after_kinematic_update  = std::abs(EigenMatrixToGtsamRot3(FKresults[0]).pitch() - real_orientation[i][0]*M_PI/180.0);
+        std::cout << std::endl << "pitch_error before kinematic estimation: " << pitch_error_before_kinematic_update;
+        std::cout << std::endl << "pitch_error after  kinematic estimation: " << pitch_error_after_kinematic_update;
+        std::cout << std::endl << "----------------------";
+
+        double roll_error_before_kinematic_update = std::abs(EigenMatrixToGtsamRot3(rtation_init).roll() - real_orientation[i][1]*M_PI/180.0);
+        double roll_error_after_kinematic_update  = std::abs(EigenMatrixToGtsamRot3(FKresults[0]).roll() - real_orientation[i][1]*M_PI/180.0);
+        std::cout << std::endl << "roll_error before kinematic estimation: " << roll_error_before_kinematic_update;
+        std::cout << std::endl << "roll_error after  kinematic estimation: " << roll_error_after_kinematic_update;
+        std::cout << std::endl << "----------------------";
+
+        double yaw_error_before_kinematic_update = std::abs(EigenMatrixToGtsamRot3(rtation_init).yaw() - real_orientation[i][2]*M_PI/180.0);
+        double yaw_error_after_kinematic_update  = std::abs(EigenMatrixToGtsamRot3(FKresults[0]).yaw() - real_orientation[i][2]*M_PI/180.0);
+        std::cout << std::endl << "yaw_error before kinematic estimation: " << yaw_error_before_kinematic_update;
+        std::cout << std::endl << "yaw_error after  kinematic estimation: " << yaw_error_after_kinematic_update;
         std::cout << std::endl << "---------------------------------------------------------------------------------------------------------" << std::endl;
 
         calibration_result.push_back({position_error_before_kinematic_update, position_error_after_kinematic_update});

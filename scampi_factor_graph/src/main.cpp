@@ -93,7 +93,6 @@ std::vector<MatrixXd> IK_Factor_Graph_Optimization(CableRobotParams robot_params
     results_list.push_back(b_in_w_);
 
     return results_list;
-
 }
 
 // ****************************************** FK optimization *******************************************
