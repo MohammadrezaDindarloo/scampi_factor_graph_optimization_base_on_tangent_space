@@ -57,7 +57,7 @@ void ikSolver(Vector3d p_platform,
     Solver::Summary summary;
     ceres::Solve(options, &problem, &summary);
     std::cout << summary.BriefReport() << "\n";
-    //harvest the results
+    // harvest the results
     double fh = x[0]; //optimized horizontal force for the first cable
     double fv = x[1]; //optimized vertical force for the first cable
     // Extract the optimized orientation matrix of the moving platform

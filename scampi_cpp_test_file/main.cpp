@@ -15,6 +15,7 @@
 #include <ceres/ceres.h>
 #include <Eigen/Dense>
 #include "libscampi_ks_solvers.h"
+#include <chrono>
 
 
 using namespace ceres;
@@ -173,15 +174,15 @@ int main(int argc, char const *argv[])
 {
   CableRobotParams robo_param(0.1034955, 43.164);
 
-  // Eigen::Vector3d Pulley_a(-1.9874742 , -8.31965637,  8.47184658);
-  // Eigen::Vector3d Pulley_b(2.52022147, -8.38887501,  8.46931362);
-  // Eigen::Vector3d Pulley_c(2.71799795, 4.77520639, 8.36416322);
-  // Eigen::Vector3d Pulley_d(-1.79662371,  4.83333111,  8.37001991);
+  Eigen::Vector3d Pulley_a(-1.9874742 , -8.31965637,  8.47184658);
+  Eigen::Vector3d Pulley_b(2.52022147, -8.38887501,  8.46931362);
+  Eigen::Vector3d Pulley_c(2.71799795, 4.77520639, 8.36416322);
+  Eigen::Vector3d Pulley_d(-1.79662371,  4.83333111,  8.37001991);
 
-  Eigen::Vector3d Pulley_a(-125.0, -110.0, 48.0);
-  Eigen::Vector3d Pulley_b( 125.0, -110.0, 48.0);
-  Eigen::Vector3d Pulley_c( 125.0,  110.0, 48.0);
-  Eigen::Vector3d Pulley_d(-125.0,  110.0, 48.0);
+  // Eigen::Vector3d Pulley_a(-125.0, -110.0, 48.0);
+  // Eigen::Vector3d Pulley_b( 125.0, -110.0, 48.0);
+  // Eigen::Vector3d Pulley_c( 125.0,  110.0, 48.0);
+  // Eigen::Vector3d Pulley_d(-125.0,  110.0, 48.0);
 
   // Eigen::Vector3d Pulley_a(-20.0, -20.0, 20.0);
   // Eigen::Vector3d Pulley_b( 20.0, -20.0, 20.0);
@@ -199,32 +200,39 @@ int main(int argc, char const *argv[])
   Eigen::Vector3d r_to_cog(0, 0, -0.12);
   robo_param.setCog(r_to_cog);
 
+  Eigen::Vector3d p_platform_inaccurate(3.09173747e-01 + 1.0, -1.83715841e+00 -1.0,  2.18367984e+00 + 0.5);
   Eigen::Vector3d p_platform(3.09173747e-01, -1.83715841e+00,  2.18367984e+00);
   Eigen::Matrix3d rot_init;
   rot_init << 0.99268615,  0.11337417, -0.04147891,
              -0.11309773,  0.99354347,  0.00895918,
               0.04222684, -0.00420248,  0.99909921; 
-  std::vector<MatrixXd> inverse_results = inverseKinematicsSolver(robo_param, p_platform, rot_init);
+  std::vector<MatrixXd> inverse_results = inverseKinematicsSolver(robo_param, p_platform_inaccurate, rot_init);
   std::cout << std::endl << "---------inverse result--------" << std::endl;
   std::cout << std::endl << "rot_platform: " << std::endl << inverse_results[0] << std::endl;
   std::cout << std::endl << "l_cat: " << std::endl << inverse_results[1] << std::endl;
-  std::cout << std::endl << "cable_forces: " << std::endl << inverse_results[2] << std::endl;
-  std::cout << std::endl << "c1: " << std::endl << inverse_results[3] << std::endl;
-  std::cout << std::endl << "c2: " << std::endl << inverse_results[4] << std::endl;
-  std::cout << std::endl << "b_in_w: " << std::endl << inverse_results[5] << std::endl;
+  // std::cout << std::endl << "cable_forces: " << std::endl << inverse_results[2] << std::endl;
+  // std::cout << std::endl << "c1: " << std::endl << inverse_results[3] << std::endl;
+  // std::cout << std::endl << "c2: " << std::endl << inverse_results[4] << std::endl;
+  // std::cout << std::endl << "b_in_w: " << std::endl << inverse_results[5] << std::endl;
 
   Eigen::VectorXd lc_cat = inverse_results[1];
   Eigen::Vector2d fc_1 = inverse_results[2].col(0);
-  Eigen::Vector3d pos_init = p_platform;
+  Eigen::Vector3d pos_init = p_platform_inaccurate;
   Eigen::Matrix3d rtation_init = rot_init;
   std::vector<MatrixXd> forward_result = forwardKinematicsSolver(robo_param, lc_cat, fc_1, pos_init, rtation_init);
   std::cout << std::endl << "---------froward result--------"  << std::endl;
   std::cout << std::endl << "rot_platform: " << std::endl << forward_result[0] << std::endl;
   std::cout << std::endl << "p_platform: " << std::endl << forward_result[1] << std::endl;
-  std::cout << std::endl << "cable_forces: " << std::endl << forward_result[2] << std::endl;
-  std::cout << std::endl << "c1: " << std::endl << forward_result[3] << std::endl;
-  std::cout << std::endl << "c2: " << std::endl << forward_result[4] << std::endl;
-  std::cout << std::endl << "b_in_w: " << std::endl << forward_result[5] << std::endl;
+  // std::cout << std::endl << "cable_forces: " << std::endl << forward_result[2] << std::endl;
+  // std::cout << std::endl << "c1: " << std::endl << forward_result[3] << std::endl;
+  // std::cout << std::endl << "c2: " << std::endl << forward_result[4] << std::endl;
+  // std::cout << std::endl << "b_in_w: " << std::endl << forward_result[5] << std::endl;
+
+  double position_error_before_kinematic_update = (p_platform - p_platform_inaccurate).norm();
+  double position_error_after_kinematic_update = (p_platform - forward_result[1]).norm();
+  std::cout << std::endl << "position_error before kinematic estimation: " << position_error_before_kinematic_update;
+  std::cout << std::endl << "position_error after  kinematic estimation: " << position_error_after_kinematic_update;
+  std::cout << std::endl << "----------------------";
 
   return 0;
 }
